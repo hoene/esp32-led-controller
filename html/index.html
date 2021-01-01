@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="author" content="Symonics GmbH" />
+	<meta name="description" content="Symonics LED Controller" />
+	<link rel="icon" href="favicon.ico">
+	</link>
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<title>Symonics LED Controller</title>
+
+</head>
+
+<body onLoad="api.init()">
+
+	<div class="container">
+		<br />
+		<div class="row justify-content-end">
+			<div class="col-sm-3">
+				<a target="_blank" href="https://www.symonics.com/"> <img src="logo.svg" width="220px"
+						class="img-responsive" />
+				</a>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<h1>LED Controller</h1>
+		</div>
+	</div>
+
+
+	<div class="container">
+
+		<div class="accordion" id="accordion" style="overflow: hidden;">
+
+			<!--  Status -->
+			<div class="card">
+				<div class="card-header" id="headingOne">
+					<h5 class="mb-0">
+						<button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+							data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">Status</button>
+					</h5>
+				</div>
+
+				<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+					<div class="card-body">
+
+
+						<div class="form-group">
+							<span class="input-group-text">LED Player</span>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-1">
+								<label class="panelX">RTP</label>
+							</div>
+							<div class="form-group col-md-2">
+								<input type="text" class="form-control" id="statusRtp" readonly />
+							</div>
+							<div class="form-group col-md-1">
+								<label class="panelX">MJPEG</label>
+							</div>
+							<div class="form-group col-md-2">
+								<input type="text" class="form-control" id="statusMjpeg" readonly />
+							</div>
+							<div class="form-group col-md-1">
+								<label class="panelX">Art-Net</label>
+							</div>
+							<div class="form-group col-md-2">
+								<input type="text" class="form-control" id="statusArtnet" readonly />
+							</div>
+							<div class="form-group col-md-3">good / lost / faulty
+								frames</div>
+
+							<div class="form-group col-md-2">
+								<label class="panelX">Last received UDP</label>
+							</div>
+							<div class="form-group col-md-7">
+								<input type="text" class="form-control" id="statusRtpLast" readonly />
+							</div>
+							<div class="form-group col-md-3">
+								<a type="button" class="btn btn-primary" target="controller_video" rel="noopener"
+									href="/rtp.jpg">Last
+									MJPEG video frame</a>
+							</div>
+							<div class="form-group col-md-2">
+								<label class="panelX">LED timing</label>
+							</div>
+							<div class="form-group col-md-10">
+								<input type="text" class="form-control" id="statusLed" readonly />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<span class="input-group-text">Networking</span>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-3">
+								<label class="panelX">WLAN Client</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="text" class="form-control" id="statusSTA" readonly />
+							</div>
+
+							<div class="form-group col-md-3">
+								<label class="panelX">WLAN Access Point</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="text" class="form-control" id="statusAP" readonly />
+							</div>
+
+							<div class="form-group col-md-3">
+								<label class="panelX">Ethernet</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="text" class="form-control" id="statusEthernet" readonly />
+							</div>
+							<div class="form-group col-md-3">
+								<label class="panelX">Registration</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="text" class="form-control" id="statusRtpServer" readonly />
+							</div>
+
+							<div class="form-group col-md-3">
+								<label class="panelX">Initial WLAN scan</label>
+							</div>
+							<div class="form-group col-md-9">
+								<pre class="form-control" readonly id="statusScan" style="height: 100%"></pre>
+							</div>
+							<!--
+                        <div class="form-group col-md-3">
+                            <label class="panelX">NTP</label>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <input type="text" class="form-control" id="statusNTP" readonly />
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="panelX">GeoIP</label>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <input type="text" class="form-control" id="statusGEOIP"
+                                readonly />
+                        </div>
+                        -->
+						</div>
+
+						<div class="form-group">
+							<span class="input-group-text">System</span>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-1">
+								<label class="panelX">Version</label>
+							</div>
+							<div class="form-group col-md-7">
+								<input type="text" class="form-control" id="statusVersion" readonly />
+							</div>
+
+							<div class="form-group col-md-1">
+								<label class="panelX">Uptime</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="text" class="form-control" id="statusTime" readonly />
+							</div>
+
+							<div class="form-group col-md-2">
+								<label class="panelX">From</label>
+							</div>
+							<div class="form-group col-md-4">
+								<input type="text" class="form-control" id="statusFrom" readonly />
+							</div>
+
+							<div class="form-group col-md-2">
+								<label class="panelX">Memory</label>
+							</div>
+							<div class="form-group col-md-4">
+								<input type="text" class="form-control" id="statusFree" readonly />
+							</div>
+
+							<div class="form-group col-md-2">
+								<label class="panelX">Boot Partition</label>
+							</div>
+							<div class="form-group col-md-4">
+								<input type="text" class="form-control" id="statusBootPartition" readonly />
+							</div>
+
+							<div class="form-group col-md-2">
+								<label class="panelX">MAC Addresses</label>
+							</div>
+							<div class="form-group col-md-4">
+								<input type="text" class="form-control" id="statusMAC" readonly />
+							</div>
+							<br />
+							<div class="form-group col-md-2">
+								<label class="panelX">System Tasks</label>
+							</div>
+							<div class="form-group col-md-10">
+								<pre class="form-control" readonly id="tasks" style="height: 100%; tab-size: 9;"></pre>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<!--  LED panel -->
+
+			<div class="card">
+				<div class="card-header" id="headingTwo">
+					<h5 class="mb-0">
+						<button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+							data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">LED
+							Panel</button>
+					</h5>
+				</div>
+				<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+					<div class="card-body">
+
+						<div class="form-group" id="lines">
+							<span class="input-group-text">Settings For All Lines</span>
+						</div>
+
+						<div class="form-row" id="lines">
+
+							<div class="form-group col-md-3">
+								<label for="artnet_width">Art-Net width</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="number" placeholder="horizontal" value="100" aria-label="horizontal"
+									class="form-control" id="artnet_width">
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="artnet_universe_offset">Art-Net universe
+									offset</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="number" placeholder="horizontal" value="0" aria-label="horizontal"
+									class="form-control" id="artnet_universe_offset">
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="prefix_leds">prefix LEDs</label>
+							</div>
+
+							<div class="form-group col-md-3">
+								<select class="form-control" id="prefix_leds">
+									<option>0</option>
+									<option>1</option>
+								</select>
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="refresh_rate">refresh rate [Hz]</label>
+							</div>
+
+							<div class="form-group col-md-3">
+								<select class="form-control" id="refresh_rate">
+									<option>2</option>
+									<option>5</option>
+									<option>10</option>
+									<option>15</option>
+									<option>20</option>
+									<option>25</option>
+									<option>30</option>
+									<option>35</option>
+									<option>40</option>
+									<option>45</option>
+									<option>50</option>
+									<option>60</option>
+									<option>75</option>
+									<option>100</option>
+									<option>150</option>
+									<option>200</option>
+									<option>250</option>
+									<option value="-1">network trigger</option>
+								</select>
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="prefix_leds">LED frequency</label>
+							</div>
+
+							<div class="form-group col-md-3">
+								<select class="form-control" id="led_frequency">
+									<option>1000000</option>
+									<option>900000</option>
+									<option>850000</option>
+									<option>800000</option>
+									<option>750000</option>
+									<option>700000</option>
+									<option>600000</option>
+									<option>500000</option>
+									<option>400000</option>
+								</select>
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="prefix_leds">LED color order</label>
+							</div>
+
+							<div class="form-group col-md-3">
+								<select class="form-control" id="led_order">
+									<option value="0">RGB</option>
+									<option value="1">RBG</option>
+									<option value="2">GRB</option>
+									<option value="3">GBR</option>
+									<option value="4">BRG</option>
+									<option value="5">BGR</option>
+									<option value="12">BW</option>
+									<option value="6">RGB + frame buffer</option>
+									<option value="7">RBG + frame buffer</option>
+									<option value="8">GRB + frame buffer</option>
+									<option value="9">GBR + frame buffer</option>
+									<option value="10">BRG + frame buffer</option>
+									<option value="11">BGR + frame buffer</option>
+									<option value="13">BW + frame buffer</option>
+								</select>
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="prefix_leds">LED one length</label>
+							</div>
+
+							<div class="form-group col-md-3">
+								<select class="form-control" id="led_one">
+									<option>90</option>
+									<option>85</option>
+									<option>80</option>
+									<option>75</option>
+									<option>70</option>
+									<option>65</option>
+									<option>60</option>
+									<option>55</option>
+								</select>
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="prefix_leds">LED zero length</label>
+							</div>
+
+							<div class="form-group col-md-3">
+								<select class="form-control" id="led_zero">
+									<option>45</option>
+									<option>40</option>
+									<option>35</option>
+									<option>30</option>
+									<option>25</option>
+									<option>20</option>
+									<option>15</option>
+									<option>10</option>
+								</select>
+							</div>
+
+						</div>
+
+
+						<div class="form-group" id="l0blocka">
+							<span class="input-group-text">LED Control Line 1</span>
+						</div>
+
+						<div class="form-row" id="l0blockb">
+
+							<div class="form-group col-md-2">
+								<label for="l0sx">size (x,y)</label>
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" placeholder="horizontal" value="8" aria-label="horizontal"
+									class="form-control" id="l0sx">
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" placeholder="vertical" value="8" aria-label="vertical"
+									class="form-control" id="l0sy">
+							</div>
+
+							<div class="form-group col-md-2">
+								<label for="l0ox">offset (x,y)</label>
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" placeholder="horizontal" value="0" aria-label="horizontal"
+									class="form-control" id="l0ox">
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" placeholder="vertical" value="0" aria-label="vertical"
+									class="form-control" id="l0oy">
+							</div>
+
+							<div class="form-group col-md-2">
+								<select class="form-control" id="l0s">
+									<option>off</option>
+									<option>RTP/Art-Net</option>
+									<option>Logo</option>
+									<option>white</option>
+									<option>gray 50%</option>
+									<option>red</option>
+									<option>yellow</option>
+									<option>green</option>
+									<option>cyan</option>
+									<option>blue</option>
+									<option>magenta</option>
+									<option>white x</option>
+									<option>white y</option>
+									<option>white x+y</option>
+									<option>lines x</option>
+									<option>lines y</option>
+									<option>lines x+y</option>
+									<option>corners</option>
+									<option>square</option>
+									<option>production test</option>
+									<option>Blink</option>
+									<option>Breath</option>
+									<option>Color Wipe</option>
+									<option>Color Wipe Inverse</option>
+									<option>Color Wipe Reverse</option>
+									<option>Color Wipe Reverse Inverse</option>
+									<option>Color Wipe Random</option>
+									<option>Random Color</option>
+									<option>Single Dynamic</option>
+									<option>Multi Dynamic</option>
+									<option>Rainbow</option>
+									<option>Rainbow Cycle</option>
+									<option>Scan</option>
+									<option>Dual Scan</option>
+									<option>Fade</option>
+									<option>Theater Chase</option>
+									<option>Theater Chase Rainbow</option>
+									<option>Running Lights</option>
+									<!-- 									<option>Twinkle</option>
+                                <option>Twinkle Random</option>
+                                <option>Twinkle Fade</option>
+<option>Twinkle Fade Random</option> -->
+									<option>Sparkle</option>
+									<option>Flash Sparkle</option>
+									<option>Hyper Sparkle</option>
+									<option>Strobe</option>
+									<option>Strobe Rainbow</option>
+									<option>Multi Strobe</option>
+									<option>Blink Rainbow</option>
+									<option>Chase White</option>
+									<option>Chase Color</option>
+									<option>Chase Random</option>
+									<option>Chase Rainbow</option>
+									<option>Chase Flash</option>
+									<option>Chase Flash Random</option>
+									<option>Chase Rainbow White</option>
+									<option>Chase Blackout</option>
+									<option>Chase Blackout Rainbow</option>
+									<option>Color Sweep Random</option>
+									<option>Running Color</option>
+									<option>Running Red Blue</option>
+									<!--									<option>Running Random</option>
+                                 <option>Larson Scanner</option>
+                                <option>Comet</option>
+                                <option>Fireworks</option>
+                                <option>Fireworks Random</option> -->
+									<option>Merry Christmas</option>
+									<option>Fire Flicker</option>
+									<option>Fire Flicker (soft)</option>
+									<option>Fire Flicker (intense)</option>
+									<option>Circus Combustus</option>
+									<option>Halloween</option>
+									<option>Bicolor Chase</option>
+									<option>Tricolor Chase</option>
+									<option>ICU</option>
+									<option>Cube</option>
+									<option>Clock</option>
+									<option>Countdown</option>
+									<option>Playlist</option>
+								</select>
+							</div>
+
+							<div class="form-group col-md-2">
+								<select class="form-control" id="l0r">
+									<option>zigzag 0°</option>
+									<option>zigzag 0° flipped</option>
+									<option>zigzag 90°</option>
+									<option>zigzag 90° flipped</option>
+									<option>zigzag 180°</option>
+									<option>zigzag 180° flipped</option>
+									<option>zigzag 270°</option>
+									<option>zigzag 270° flipped</option>
+									<option>meander 0°</option>
+									<option>meander 0° flipped</option>
+									<option>meander 90°</option>
+									<option>meander 90° flipped</option>
+									<option>meander 180°</option>
+									<option>meander 180° flipped</option>
+									<option>meander 270°</option>
+									<option>meander 270° flipped</option>
+								</select>
+							</div>
+
+							<div class="form-group col-md-2">
+								<label for="l0op">options</label>
+							</div>
+							<div class="form-group col-md-10">
+								<input type="" placeholder="e.g., black=10,11,12" maxlength="64" aria-label="horizontal"
+									class="form-control" id="l0op">
+							</div>
+
+						</div>
+
+
+						<button type="button" data-toggle="modal" data-target="#modalDiscard" class="btn btn-secondary"
+							onclick="location.reload()">Discard changes</button>
+						<button type="button" data-toggle="modal" data-target="#modalApplyLED" class="btn btn-primary"
+							onclick="api.applyLed()">Apply LED panel changes</button>
+
+					</div>
+				</div>
+			</div>
+
+
+			<!--  color control -->
+
+			<div class="card">
+				<div class="card-header" id="headingColor">
+					<h5 class="mb-0">
+						<button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+							data-target="#collapseColor" aria-expanded="false" aria-controls="collapseColor">Color
+							Control</button>
+					</h5>
+				</div>
+				<div id="collapseColor" class="collapse" aria-labelledby="headingColor" data-parent="#accordion">
+					<div class="card-body">
+
+						<div class="form-row">
+							<div class="form-group col-md-2">
+								<label for="colorLightness1">Lightness</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider" id="colorLightness1"
+									oninput="api.colorChange(this)" onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider" id="colorLightness2"
+									onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-2">
+								<label for="colorContrast1">Contrast</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider" id="colorContrast1"
+									oninput="api.colorChange(this)" onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider" id="colorContrast2"
+									onchange="api.colorChange(this)" />
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-2">
+								<label for="colorLightness1">Hue</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider" id="colorHue1"
+									oninput="api.colorChange(this)" onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider" id="colorHue2"
+									onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-2">
+								<label for="colorContrast1">Saturation</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider" id="colorSaturation1"
+									oninput="api.colorChange(this)" onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider" id="colorSaturation2"
+									onchange="api.colorChange(this)" />
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-2">
+								<label for="colorRedLightness1">Red lightness</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider"
+									id="colorRedLightness1" oninput="api.colorChange(this)"
+									onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider"
+									id="colorRedLightness2" onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-2">
+								<label for="colorRedContrast1">Red contrast</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider" id="colorRedContrast1"
+									oninput="api.colorChange(this)" onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider"
+									id="colorRedContrast2" onchange="api.colorChange(this)" />
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-2">
+								<label for="colorGreenLightness1">Green lightness</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider"
+									id="colorGreenLightness1" oninput="api.colorChange(this)"
+									onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider"
+									id="colorGreenLightness2" onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-2">
+								<label for="colorGreenContrast1">Green contrast</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider"
+									id="colorGreenContrast1" oninput="api.colorChange(this)"
+									onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider"
+									id="colorGreenContrast2" onchange="api.colorChange(this)" />
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-2">
+								<label for="colorBlueLightness1">Blue lightness</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider"
+									id="colorBlueLightness1" oninput="api.colorChange(this)"
+									onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider"
+									id="colorBlueLightness2" onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-2">
+								<label for="colorBlueContrast1">Blue contrast</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="range" min="-100" max="100" value="0" class="slider"
+									id="colorBlueContrast1" oninput="api.colorChange(this)"
+									onchange="api.colorChange(this)" />
+							</div>
+							<div class="form-group col-md-1">
+								<input type="number" min="-100" max="100" value="0" class="slider"
+									id="colorBlueContrast2" onchange="api.colorChange(this)" />
+							</div>
+						</div>
+
+						<button type="button" class="btn btn-secondary" onclick="api.colorDiscard()">Discard
+							changes</button>
+						<button type="button" class="btn btn-danger" onclick="api.colorDefaults()">Set defaults</button>
+						<button type="button" class="btn btn-primary" onclick="api.colorWrite()">Store changes</button>
+
+					</div>
+				</div>
+			</div>
+
+			<!--  Network -->
+
+			<div class="card">
+				<div class="card-header" id="headingThree">
+					<h5 class="mb-0">
+						<button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+							data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+							Network</button>
+					</h5>
+				</div>
+				<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+					<div class="card-body">
+
+						<div class="form-group">
+							<span class="input-group-text">LED Player</span>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-3">
+								<label class="panelX">RTP/Art-Net Port</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="number" class="form-control" id="statusRTPPort" />
+							</div>
+
+							<div class="form-group col-md-3">
+								<label class="panelX">Registration server</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="text" class="form-control" id="statusRegistrationServer" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<span class="input-group-text">Wifi Client</span>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-3">
+								<label class="panelX">SSID</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="text" class="form-control" id="statusClientSSID" />
+							</div>
+
+							<div class="form-group col-md-3">
+								<label class="panelX">Password</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="password" class="form-control" id="statusClientPassword" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<span class="input-group-text">Wifi Access Point</span>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-3">
+								<label class="panelX">SSID</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="text" class="form-control" id="statusAPSSID" />
+							</div>
+
+							<div class="form-group col-md-3">
+								<label class="panelX">Password</label>
+							</div>
+							<div class="form-group col-md-3">
+								<input type="password" class="form-control" id="statusAPPassword" />
+							</div>
+						</div>
+
+						<button type="button" data-toggle="modal" data-target="#modalDiscard" class="btn btn-secondary"
+							onclick="location.reload()">Discard changes</button>
+						<button type="button" data-toggle="modal" data-target="#modalApplyNetwork"
+							class="btn btn-primary" onclick="api.applyNetwork()">Apply network changes</button>
+					</div>
+				</div>
+			</div>
+
+			<!--  Time -->
+
+			<div class="card" style="display:none;">
+				<div class="card-header" id="headingTime">
+					<h5 class="mb-0">
+						<button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+							data-target="#collapseTime" aria-expanded="false" aria-controls="collapseTime">Time
+							and Date</button>
+					</h5>
+				</div>
+				<div id="collapseTime" class="collapse" aria-labelledby="headingTime" data-parent="#accordion">
+					<div class="card-body">
+
+						<div class="form-group">
+							<span class="input-group-text">Current time, date, and
+								time zone</span>
+						</div>
+
+						<div class="form-row">
+
+							<div class="form-group col-md-1">
+								<label class="col-form-label" for="selectHour">Time</label>
+							</div>
+							<div class="form-group col-md-1">
+								<select class="form-control" id="selectHour">
+									<option selected>00</option>
+								</select>
+							</div>
+							<div class="form-group col-md-1">
+								<label class="col-form-label" for="selectMinute">:</label>
+							</div>
+							<div class="form-group col-md-1">
+								<select class="form-control" id="selectMinute">
+									<option selected>00</option>
+								</select>
+							</div>
+							<div class="form-group col-md-2"></div>
+							<div class="form-group col-md-1">
+								<label class="col-form-label">Date</label>
+							</div>
+							<div class="form-group col-md-1">
+								<select class="form-control" id="selectDay">
+									<option selected>01</option>
+								</select>
+							</div>
+							<div class="form-group col-md-1">
+								<label class="col-form-label">.</label>
+							</div>
+							<div class="form-group col-md-1">
+								<select class="form-control" id="selectMonth">
+									<option selected>01</option>
+								</select>
+							</div>
+							<div class="form-group col-md-1">
+								<label class="col-form-label">.</label>
+							</div>
+							<div class="form-group col-md-1">
+								<select class="form-control" id="selectYear">
+									<option selected>2000</option>
+								</select>
+							</div>
+
+						</div>
+
+						<div class="form-row">
+
+							<div class="form-group col-md-3">
+
+								<label class="panelX">Time zone offset</label>
+							</div>
+							<div class="form-group col-md-3">
+
+								<select class="form-control" id="selectTimedate">
+									<option value="-12">UTC−12:00</option>
+									<option value="-11">UTC−11:00</option>
+									<option value="-10">UTC−10:00</option>
+									<option value="-9.5">UTC−09:30</option>
+									<option value="-9">UTC−09:00</option>
+									<option value="-8">UTC−08:00</option>
+									<option value="-7">UTC−07:00</option>
+									<option value="-6">UTC−06:00</option>
+									<option value="-6">UTC−05:00</option>
+									<option value="-4">UTC−04:00</option>
+									<option value="-3.5">UTC−03:30</option>
+									<option value="-3">UTC−03:00</option>
+									<option value="-2">UTC−02:00</option>
+									<option value="-1">UTC−01:00</option>
+									<option value="0">UTC±00:00</option>
+									<option value="1">UTC+01:00</option>
+									<option value="2" selected>UTC+02:00</option>
+									<option value="3">UTC+03:00</option>
+									<option value="3.5">UTC+03:30</option>
+									<option value="4">UTC+04:00</option>
+									<option value="4.5">UTC+04:30</option>
+									<option value="5">UTC+05:00</option>
+									<option value="5.5">UTC+05:30</option>
+									<option value="5.75">UTC+05:45</option>
+									<option value="6">UTC+06:00</option>
+									<option value="6.5">UTC+06:30</option>
+									<option value="7">UTC+07:00</option>
+									<option value="8">UTC+08:00</option>
+									<option value="8.75">UTC+08:45</option>
+									<option value="9">UTC+09:00</option>
+									<option value="10">UTC+10:00</option>
+									<option value="10.3">UTC+10:30</option>
+									<option value="11">UTC+11:00</option>
+									<option value="12">UTC+12:00</option>
+									<option value="12.75">UTC+12:45</option>
+									<option value="13">UTC+13:00</option>
+									<option value="14">UTC+14:00</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<span class="input-group-text">Automatic (requiring
+								Internet access)</span>
+						</div>
+
+						<div class="form-row">
+
+							<div class="form-group col-md-5">
+								<div class="form-group form-check">
+									<input type="checkbox" class="form-check-input" id="timeNTP">
+									<label class="form-check-label" for="timeNTP">Get time
+										from NTP server</label> </input>
+								</div>
+							</div>
+
+							<div class="form-group col-md-7">
+								<div class="form-group form-check">
+									<input type="checkbox" class="form-check-input" id="timeTimezone"> <label
+										class="form-check-label" for="timeTimezone">Get timezone from <a
+											href="https://ipgeolocation.io/">IOGeolocation.io</a> web
+										service
+									</label> </input>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-3">
+								<button type="button" data-toggle="modal" data-target="#modalTimeDiscard"
+									class="btn btn-secondary" onclick="location.reload()">Discard changes</button>
+							</div>
+							<div class="form-group col-md-3">
+								<button type="button" data-toggle="modal" data-target="#modalApplyTime"
+									class="btn btn-primary" onclick="api.applyTime()">Apply changes</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--  Playlist -->
+
+			<div class="card" style="display:none;">
+				<div class="card-header" id="headingFile">
+					<h5 class="mb-0">
+						<button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+							data-target="#collapseFile" aria-expanded="false"
+							aria-controls="collapseFile">Playlist</button>
+					</h5>
+				</div>
+				<div id="collapseFile" class="collapse" aria-labelledby="headingFile" data-parent="#accordion">
+					<div class="card-body">
+
+						<div class="form-group">
+							<span class="input-group-text">Entries</span>
+						</div>
+
+						<div class="form-row" id="p0">
+							<div class="form-group col-md-3">
+								<span id="p0filename">file</span>
+							</div>
+							<div class="form-group col-md-2">
+								<label class="panelX">Duration [s]</label>
+							</div>
+							<div class="form-group col-md-2">
+								<input type="number" min="0" max="999" value="5" class="form-control" id="p0duration">
+								</input>
+							</div>
+
+							<div class="form-group col-md-2">
+								<select class="form-control" id="p0mode">
+									<option value="1">○</option>
+									<option value="2">⬤</option>
+									<option value="3">⮊</option>
+									<option value="4">⮈</option>
+									<option value="5">⮋</option>
+									<option value="6">⮉</option>
+								</select>
+							</div>
+
+							<div class="form-group col-md-3">
+								<div class="btn-group" role="group">
+									<button type="button" onclick="api.deletePlaylistEntry(this)"
+										class="btn btn-danger">ᳵ</button>
+									<button type="button" onclick="api.upPlaylistEntry(this)"
+										class="btn btn-info">⇑</button>
+									<button type="button" onclick="api.downPlaylistEntry(this)"
+										class="btn btn-info">⇓</button>
+								</div>
+							</div>
+						</div>
+
+						<button type="button" data-toggle="modal" data-target="#modalFileUpload" class="btn btn-primary"
+							onclick="api.addPlaylistFile()">Add file</button>
+
+						<button type="button" data-toggle="modal" data-target="#modalUrlAdd" class="btn btn-primary"
+							onclick="api.addPlaylistUrl()">Add link</button>
+
+						<button type="button" data-toggle="modal" data-target="#modalDiscard" class="btn btn-secondary"
+							onclick="location.reload()">Discard changes</button>
+						<button type="button" data-toggle="modal" data-target="#modalApplyNetwork"
+							class="btn btn-primary" onclick="api.applyPlaylist()">Apply changes</button>
+					</div>
+				</div>
+			</div>
+
+			<!--  Administration -->
+			<div class="card">
+				<div class="card-header" id="headingFour">
+					<h5 class="mb-0">
+						<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFour"
+							aria-expanded="true" aria-controls="collapseFour">Administration</button>
+					</h5>
+				</div>
+				<div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+					<div class="card-body">
+						<button type="button" data-toggle="modal" data-target="#modalReboot"
+							class="btn btn-primary">Reboot</button>
+						<button type="button" data-toggle="modal" data-target="#modalDefaults"
+							class="btn btn-danger">Set
+							factory defaults</button>
+						<button type="button" data-toggle="modal" data-target="#modalUpdate"
+							class="btn btn-primary">Update
+							firmware from file</button>
+						<!-- 
+                        <button type="button" data-toggle="modal"
+                            data-target="#modalUpdate" class="btn btn-primary">Update
+                            firmware from Symonics</button> -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal Reboot -->
+	<div class="modal fade" id="modalReboot" tabindex="-1" role="dialog" aria-labelledby="modalRebootLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalRebootLabel">Reboot
+						controller?</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">The controller will be shutdown and
+					reboot. It will be not available for a few seconds.</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal"
+						data-target="#modalBooting" onclick="api.reboot();">Yes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal Disconnect -->
+	<div class="modal fade" id="modalError" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalLabel">Error reset?</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" id="statusErrorMessage"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal Updating -->
+	<div class="modal fade" id="modalUpdating" tabindex="-1" role="dialog" aria-labelledby="modalUpdatingLabel"
+		aria-hidden="true" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalUpdatingLabel">Updating in
+						progress</h5>
+				</div>
+				<div class="modal-body">
+					Please wait a few seconds. The page will reload automatically.<br />
+					<div class="progress">
+						<div class="progress-bar" role="progressbar" id="updatingBar" style="width: 0%;"
+							aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Update -->
+	<div class="modal fade" id="modalUpdate" tabindex="-1" role="dialog" aria-labelledby="modalUpdateLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalUpdateLabel">Update firmware</h5>
+
+				</div>
+				<form id="uploadForm">
+					<div class="modal-body">
+						Do you want to reprogram the controller with a new software
+						version? Please upload the firmware file:<br /> <br />
+
+
+						<div class="form-group">
+							<input required name="file" type="file" accept=".bin" class="form-control" id="updateFile"
+								aria-describedby="updateFilelHelp"
+								placeholder="Enter select the firmware file, which you got from Symonics." />
+						</div>
+					</div>
+					<div class="modal-footer">
+
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<input type="submit" class="btn btn-primary" data-dismiss="modal" data-toggle="modal"
+							data-target="#modalUpdating" value="Upload
+                                and update" onclick="api.upload();" />
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal Booting -->
+	<div class="modal fade" id="modalBooting" tabindex="-1" role="dialog" aria-labelledby="modalBootingLabel"
+		aria-hidden="true" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalBootingLabel">Rebooting...</h5>
+				</div>
+				<div class="modal-body">
+					Please wait a few seconds. The page will reload automatically.<br />
+					<div class="progress">
+						<div class="progress-bar" role="progressbar" id="rebootBar" style="width: 0%;" aria-valuenow="0"
+							aria-valuemin="0" aria-valuemax="100"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!--  File upload -->
+	<div class="modal fade" id="modalPlaylistFile" tabindex="-1" role="dialog" aria-labelledby="modalPlaylistFileLabel"
+		aria-hidden="true" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalPlaylistFileLabel">Add new media</h5>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<label for="exampleFormControlFile1">Please select a JPEG, PBM, PGM, PPM, or M-JPEG
+								file.</label>
+							<input required name="file" type="file"
+								accept="image/jpeg,image/x-portable-anymap,video/x-motion-jpeg" class="form-control"
+								id="updatePlaylistFile" aria-describedby="updatePlaylistFilelHelp"
+								placeholder="Enter select a media file." />
+						</div>
+					</form>
+					<div class="progress">
+						<div class="progress-bar" role="progressbar" id="rebootBar" style="width: 0%;" aria-valuenow="0"
+							aria-valuemin="0" aria-valuemax="100"></div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					<input type="submit" class="btn btn-primary" data-dismiss="modal" data-toggle="modal"
+						data-target="#modalPlaylistUpdating" value="Upload media" onclick="api.playlistUpload();" />
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal wait -->
+	<div id="loading"
+		style="height: 100%; width: 100%; position: fixed; opacity: 0.9; background: #000; z-index: 10; top: 0; left: 0; ">
+	</div>
+
+	<script src="jquery.slim.min.js"></script>
+	<script src="bootstrap.bundle.min.js"></script>
+	<script src="local.js"></script>
+
+</body>
+
+</html>

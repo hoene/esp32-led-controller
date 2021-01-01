@@ -1,0 +1,8 @@
+sdkconfig.old
+build
+.settings
+main/compile.c
+*~
+dictionary.txt
+.vscode
+

@@ -1,0 +1,6 @@
+[submodule "esp-idf"]
+	path = esp-idf
+	url = git@github.com:espressif/esp-idf.git
+[submodule "components/esp32-espfs"]
+	path = components/espfs
+	url = https://github.com/jkent/esp32-espfs.git
