@@ -8,7 +8,7 @@
 
 <div align="center">
 <a href="https://travis-ci.com/github/hoene/esp32-led-controller">
-<img alt="Travis CI Status" src="https://travis-ci.org/hoene/esp32-led-controller.svg?branch=master"/>
+<img alt="Travis CI Status" src="https://api.travis-ci.com/hoene/esp32-led-controller.svg?branch=master"/>
 </a>
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GUN8R6NUQCS3C&source=url">
 <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate with PayPal button" />
