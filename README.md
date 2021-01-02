@@ -2,7 +2,7 @@
 <a href="https://symonics.com/">
 	<img alt="Symonics MySofa" width="320px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/media-1.png"/>
 </a>
-</div
+</div>
 
 #
 
@@ -85,7 +85,7 @@ Then, go to the web page, e.g. http://192.168.4.130/. You should see something l
 <a href="https://symonics.com/">
 	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/overview.png"/>
 </a>
-</div
+</div>
 
 In the LED Panel card, you can select the size and type of your LED displays.
 
@@ -93,7 +93,7 @@ In the LED Panel card, you can select the size and type of your LED displays.
 <a href="https://symonics.com/">
 	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/ledpanel.png"/>
 </a>
-</div
+</div>
 
 The Color Control card allow to change brightness or color of all displays.
 
@@ -101,7 +101,7 @@ The Color Control card allow to change brightness or color of all displays.
 <a href="https://symonics.com/">
 	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/colorcontrol.png"/>
 </a>
-</div
+</div>
 
 With the Network card, you can change the wifi settings.
 
@@ -109,7 +109,7 @@ With the Network card, you can change the wifi settings.
 <a href="https://symonics.com/">
 	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/network.png"/>
 </a>
-</div
+</div>
 
 The administration is for maintainces:
 
@@ -117,7 +117,7 @@ The administration is for maintainces:
 <a href="https://symonics.com/">
 	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/administration.png"/>
 </a>
-</div
+</div>
 
 And finally, the Status card give you an overview on the entire system. Its is only for testing and maintaince. It provides you information about the ESP32 system.
 
@@ -125,7 +125,7 @@ And finally, the Status card give you an overview on the entire system. Its is o
 <a href="https://symonics.com/">
 	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/status.png"/>
 </a>
-</div
+</div>
 
 
 ## Video Streaming
