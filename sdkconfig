@@ -212,12 +212,6 @@ CONFIG_SPI_SLAVE_ISR_IN_IRAM=y
 # end of SPI configuration
 
 #
-# TWAI configuration
-#
-# CONFIG_TWAI_ISR_IN_IRAM is not set
-# end of TWAI configuration
-
-#
 # UART configuration
 #
 # CONFIG_UART_ISR_IN_IRAM is not set

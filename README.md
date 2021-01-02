@@ -38,6 +38,15 @@ If you use 12V LEDs, you might need a TTL level converter to convert the output 
 * Sparkfun BOB-12009 [https://www.sparkfun.com/products/12009]
 * Amazon 8 Channel Logic Level Converter [https://amzn.to/2KgCOyV] or [https://amzn.to/3mJUct2]
 
+For example, you may setup your test hardware such as the following
+
+<div align="center">
+<a href="https://symonics.com/">
+	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/setup.jpg"/>
+</a>
+</div
+
+
 ## Required Software
 
 The ESP32 development environment is required. Download and install it from [https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/].
@@ -71,7 +80,54 @@ Connect your ESP32 via USB to get a serial programming interface, which you need
 # Usage
 
 Connect your PC the LED controller via Ethernet or Wifi. The default Wifi AP password is "controller".
-Then, go to the web page, e.g. http://192.168.4.130/
+Then, go to the web page, e.g. http://192.168.4.130/. You should see something like:
+
+<div align="center">
+<a href="https://symonics.com/">
+	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/overview.png"/>
+</a>
+</div
+
+In the LED Panel card, you can select the size and type of your LED displays.
+
+<div align="center">
+<a href="https://symonics.com/">
+	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/ledpanel.png"/>
+</a>
+</div
+
+The Color Control card allow to change brightness or color of all displays.
+
+<div align="center">
+<a href="https://symonics.com/">
+	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/colorcontrol.png"/>
+</a>
+</div
+
+With the Network card, you can change the wifi settings.
+
+<div align="center">
+<a href="https://symonics.com/">
+	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/network.png"/>
+</a>
+</div
+
+The administration is for maintainces:
+
+<div align="center">
+<a href="https://symonics.com/">
+	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/administration.png"/>
+</a>
+</div
+
+And finally, the Status card give you an overview on the entire system. Its is only for testing and maintaince. It provides you information about the ESP32 system.
+
+<div align="center">
+<a href="https://symonics.com/">
+	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/status.png"/>
+</a>
+</div
+
 
 ## Video Streaming
 
