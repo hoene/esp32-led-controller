@@ -6,7 +6,17 @@
 
 #
 
+<div align="center">
+<a href="https://travis-ci.com/github/hoene/esp32-led-controller">
+<img alt="Travis CI Status" src="https://travis-ci.org/hoene/esp32-led-controller.svg?branch=master"/>
+</a>
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GUN8R6NUQCS3C&source=url">
+<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate with PayPal button" />
+</a>
+</div>
+
 # LED Controller
+
 
 This a software for the ESP32 chip, which can control multiple LED matrix displays. The LED displays must be based on smart LEDs such WS2813, GS8218, neopixels, or others. Up to eight serial data interfaces are supported.
 
@@ -27,15 +37,6 @@ However, it should not be too difficult to add support other modules.
 If you use 12V LEDs, you might need a TTL level converter to convert the output from a 3.3V level to higher, e.g. 5 or 12V.
 * Sparkfun BOB-12009 [https://www.sparkfun.com/products/12009]
 * Amazon 8 Channel Logic Level Converter [https://amzn.to/2KgCOyV] or [https://amzn.to/3mJUct2]
-
-<div align="center">
-<a href="https://travis-ci.org/hoene/libmysofa">
-<img alt="Travis CI Status" src="https://travis-ci.org/hoene/esp32-led-controller.svg?branch=master"/>
-</a>
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GUN8R6NUQCS3C&source=url">
-<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate with PayPal button" />
-</a>
-</div>
 
 ## Required Software
 

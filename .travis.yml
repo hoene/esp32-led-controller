@@ -4,10 +4,10 @@ services:
   - docker
 
 before_install:
-- docker pull carlad/sinatra
-- docker run -d -p 127.0.0.1:80:4567 carlad/sinatra /bin/sh -c "cd /root/sinatra; bundle exec foreman start;"
+- docker pull docker pull espressif/idf:release-v4.2
+- docker run -d -p 127.0.0.1:80:4567 espressif/idf:release-v4.2 /bin/sh -c "echo TODO"
 - docker ps -a
-- docker run carlad/sinatra /bin/sh -c "cd /root/sinatra; bundle exec rake test"
+- docker run espressif/idf:release-v4.2 /bin/sh -c "make all"
 
 script:
 - bundle exec rake test
