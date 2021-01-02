@@ -44,8 +44,7 @@ For example, you may setup your test hardware such as the following
 <a href="https://symonics.com/">
 	<img width="640px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/setup.jpg"/>
 </a>
-</div
-
+</div>
 
 ## Required Software
 
@@ -141,4 +140,4 @@ Or if you want to play a movie, call
 
 ## Disclaimer
 
-The source code is by <christian.hoene@symonics.com>, <a href="https://symonics.com/">Symonics GmbH</a>, and available under AGPL V3 license. The inital work has been funded by German <a href="https://www.bmbf.de">Federal Ministry of Education and Research</a> within the Fastmusic project. 
+The file ws2812fx.c is based on the work of <a href="https://github.com/kitesurfer1404/WS2812FX">Harm Aldick (kitesurfer1404)</a>. The remaining source code is by <christian.hoene@symonics.com>, <a href="https://symonics.com/">Symonics GmbH</a>, and available under AGPL V3 license. The inital work has been funded by German <a href="https://www.bmbf.de">Federal Ministry of Education and Research</a> within the Fastmusic project. 
