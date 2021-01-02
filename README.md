@@ -1,6 +1,20 @@
+<div align="right">
+<a href="https://symonics.com/">
+	<img alt="Symonics MySofa" width="320px" src="https://raw.githubusercontent.com/hoene/esp32-led-controller/master/doc/media-1.png"/>
+</a>
+</div
+
+#
+
 # LED Controller
 
-This a software for the ESP32 to control a multiple LED matrix display using smart LEDs such WS2813, GS8218, and others
+This a software for the ESP32 chip, which can control multiple LED matrix displays. The LED displays must be based on smart LEDs such WS2813, GS8218, neopixels, or others. Up to eight serial data interfaces are supported.
+
+The LED controller provides a web interface, available via ethernet, a wifi access point, or via wifi client. Via the web interface, the displays, colors format, and display order can be controlled.
+
+A video streaming interface is available via UDP port 1616. The image format must be RTP/MJPEG.
+
+Alternative, different testing patterns can be started on the web page of the LED controller.
 
 ## Required Hardware
 
@@ -14,59 +28,60 @@ If you use 12V LEDs, you might need a TTL level converter to convert the output 
 * Sparkfun BOB-12009 [https://www.sparkfun.com/products/12009]
 * Amazon 8 Channel Logic Level Converter [https://amzn.to/2KgCOyV] or [https://amzn.to/3mJUct2]
 
+<div align="center">
+<a href="https://travis-ci.org/hoene/libmysofa">
+<img alt="Travis CI Status" src="https://travis-ci.org/hoene/esp32-led-controller.svg?branch=master"/>
+</a>
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GUN8R6NUQCS3C&source=url">
+<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" alt="Donate with PayPal button" />
+</a>
+</div>
+
 ## Required Software
 
 The ESP32 development environment is required. Download and install it from [https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/].
 
+## Programming
+
+To set up your ESP32 controller with this software, please the github repository with
+
+> git clone https://github.com/hoene/esp32-led-controller
+
+You may want to reconfigure the hardware. Please either copy an existing '''sdkconfig''' file, e.g.
+
+> cd esp32-led-controller
+
+> cp sdkconfig.OLIMEX_ESP32_EVB_B sdkconfig
+    
+or configure your particular hardware via
+
+> idf.py menuconfig 
+    
+to the setting you need. In the menu CONTROLLER you find the settings needed.
+
+You compile the LED controller software with
+
+> idf.py build
+    
+Connect your ESP32 via USB to get a serial programming interface, which you need to flash the ESP32. To flash the ESP32 call
+
+> idf.py flash
+
 # Usage
 
-## Testing
-
-Invalid data:
-
-    echo "This is my data" > /dev/udp/192.168.4.136/1616
-    
-Cude data:
-
-    echo "(324324.234234,234234423.234324,3242334.4)" > /dev/udp/192.168.4.136/1616
-    
-RTP data:
-
-    echo -n -e '\x02\x00\x02\x01TIMESSRC' > /dev/udp/192.168.4.136/1616
-
-    I (563775) #rtp.c : pt 0 seq 258 ts 1162692948
-     1014  git commit -m "Added ffmpeg from https://github.com/hoene/FFmpeg"
+Connect your PC the LED controller via Ethernet or Wifi. The default Wifi AP password is "controller".
+Then, go to the web page, e.g. http://192.168.4.130/
 
 ## Video Streaming
 
-hoene@dev1:~/esp/controller$ ~/Downloads/ffmpeg-4.0.2-64bit-static/ffmpeg -f x11grab -framerate 2 -i :0.0+0,0 -vf scale=32:32 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.127:1616/
-SDP:
-v=0
-o=- 0 0 IN IP4 127.0.0.1
-s=No Name
-c=IN IP4 192.168.4.133
-t=0 0
-a=tool:libavformat 58.12.100
-m=video 1616 RTP/AVP 26
-b=AS:200
+On Linux, to stream from your desktop to the LED controller call - after adapting the parameter - the command:
 
-/home/hoene/Downloads/ffmpeg-4.0.2-64bit-static/ffmpeg -f x11grab -framerate 2 -i :0.0+0,0 -vf scale=16:16 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.133:1616/
+> ffmpeg -f x11grab -framerate 2 -i :0.0+0,0 -vf scale=32:32 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.130:1616/
 
-/home/hoene/Downloads/ffmpeg-4.0.2-64bit-static/ffmpeg /home/hoene/Downloads/TV-20181013-2354-3701.h264.mp4 -framerate 2 -vf scale=16:8 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.133:1616/
+Or if you want to play a movie, call
 
-/home/hoene/Downloads/ffmpeg-4.0.2-64bit-static/ffmpeg -re -i /home/hoene/Downloads/TV-20181013-2354-3701.h264.mp4 -map 0:0 -r 5 -vf scale=16:8 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.133:1616/
+> ffmpeg filme.mp4 -framerate 2 -vf scale=16:8 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.130:1616/
 
-## Secure flashing (first time)
+## Disclaimer
 
-cd controller
-
-# erase everything
-make erase_flash
-
-# make the bootloader
-make -j bootloader
-
-
-# make the flash program
-make -j flash
-
+The source code is by <christian.hoene@symonics.com>, <a href="https://symonics.com/">Symonics GmbH</a>, and available under AGPL V3 license. The inital work has been funded by German <a href="https://www.bmbf.de">Federal Ministry of Education and Research</a> within the Fastmusic project. 
