@@ -116,6 +116,10 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
     }
     break;
 
+  case SYSTEM_EVENT_STA_WPS_ER_PIN:
+    // WPS is not supported, yes
+    break;
+
   default:
     ESP_LOGE(TAG, "SYSTEM_EVENT unknown %d", event_id);
     break;
@@ -126,7 +130,6 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 
 static void wifi_init_softap(esp_netif_t *netif_ap)
 {
-
 #if 0
    esp_netif_ip_info_t ip_info;
    esp_netif_set_ip4_addr(&ip_info.ip, 192, 168, 14, 1);
@@ -141,9 +144,9 @@ static void wifi_init_softap(esp_netif_t *netif_ap)
              .authmode = WIFI_AUTH_WPA_WPA2_PSK},
   };
   strncpy((char *)wifi_config.ap.ssid, config_get_wifi_ap_ssid(),
-          sizeof(wifi_config.ap.ssid));
+          sizeof(wifi_config.ap.ssid) - 1);
   strncpy((char *)wifi_config.ap.password, config_get_wifi_ap_password(),
-          sizeof(wifi_config.ap.password));
+          sizeof(wifi_config.ap.password) - 1);
   if (strlen(config_get_wifi_ap_password()) == 0)
   {
     wifi_config.ap.authmode = WIFI_AUTH_OPEN;
@@ -159,9 +162,9 @@ static void wifi_init_sta()
   wifi_config_t wifi_config;
   memset(&wifi_config, 0, sizeof(wifi_config));
   strncpy((char *)wifi_config.sta.ssid, config_get_wifi_sta_ssid(),
-          sizeof(wifi_config.sta.ssid));
+          sizeof(wifi_config.sta.ssid) - 1);
   strncpy((char *)wifi_config.sta.password, config_get_wifi_sta_password(),
-          sizeof(wifi_config.sta.password));
+          sizeof(wifi_config.sta.password) - 1);
 
   ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
 
@@ -178,18 +181,22 @@ static void wifi_scan_done(esp_netif_t *netif_ap)
 {
   uint16_t number;
   ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&number));
+  ESP_LOGI(TAG, "AP NUM %04X", number);
 
   wifi_ap_record_t *ap_records = malloc(sizeof(wifi_ap_record_t) * number);
-  ESP_ERROR_CHECK(ap_records ? ESP_OK : ESP_ERR_NO_MEM);
-  ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, ap_records));
-
-  for (int i = 0; i < number; i++)
+  if (number > 0)
   {
-    ESP_LOGI(TAG, "AP %d: %02X%02X%02X%02X%02X%02X %d %s %s	", // %d %s %s %s,",
-             i, ap_records[i].bssid[0], ap_records[i].bssid[1],
-             ap_records[i].bssid[2], ap_records[i].bssid[3],
-             ap_records[i].bssid[4], ap_records[i].bssid[5], ap_records[i].rssi,
-             wifi_auth_names[ap_records[i].authmode], ap_records[i].ssid);
+    ESP_ERROR_CHECK(ap_records ? ESP_OK : ESP_ERR_NO_MEM);
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, ap_records));
+
+    for (int i = 0; i < number; i++)
+    {
+      ESP_LOGI(TAG, "AP %d: %02X%02X%02X%02X%02X%02X %d %s %s	", // %d %s %s %s,",
+               i, ap_records[i].bssid[0], ap_records[i].bssid[1],
+               ap_records[i].bssid[2], ap_records[i].bssid[3],
+               ap_records[i].bssid[4], ap_records[i].bssid[5], ap_records[i].rssi,
+               wifi_auth_names[ap_records[i].authmode], ap_records[i].ssid);
+    }
   }
 
   status_scan(number, ap_records);

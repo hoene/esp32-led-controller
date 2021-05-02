@@ -466,7 +466,7 @@ const char *config_get_udp_server() {
 }
 
 static void scpy(char *dst, const char *src, int len) {
-	strncpy(dst, src, len);
+	strncpy(dst, src, len-1);
 	dst[len - 1] = 0;
 }
 
