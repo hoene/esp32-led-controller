@@ -171,6 +171,7 @@ void web_on()
 	config.uri_match_fn = httpd_uri_match_wildcard;
 	config.open_fn = websession_add;
 	config.close_fn = websession_remove;
+	config.stack_size = 1024*6;
 
 	/* Empty handle to esp_http_server */
 	assert(!web_handle);
