@@ -41,35 +41,34 @@
 
 static const char *TAG = "#ethernet";
 
-static esp_eth_handle_t eth_handle = NULL;
-
 /** Event handler for Ethernet events */
 static void eth_event_handler(void *arg, esp_event_base_t event_base,
                               int32_t event_id, void *event_data)
 {
-	char string[64];
+    char string[64];
 
     uint8_t mac_addr[6] = {0};
     /* we can get the ethernet driver handle from event data */
     esp_eth_handle_t eth_handle = *(esp_eth_handle_t *)event_data;
 
-    switch (event_id) {
+    switch (event_id)
+    {
     case ETHERNET_EVENT_CONNECTED:
         esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, mac_addr);
         ESP_LOGI(TAG, "Ethernet Link Up");
         ESP_LOGI(TAG, "Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x",
                  mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-        snprintf(string, sizeof(string), "connected, %s", ethernet_status());
+        snprintf(string, sizeof(string), "connected, %s", ethernet_status(eth_handle));
         status_ethernet(string);
         break;
     case ETHERNET_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "Ethernet Link Down");
         status_ethernet("disconnected");
-// TODO       ESP_ERROR_CHECK(tcpip_adapter_down(TCPIP_ADAPTER_IF_ETH));
+        // TODO       ESP_ERROR_CHECK(tcpip_adapter_down(TCPIP_ADAPTER_IF_ETH));
         break;
     case ETHERNET_EVENT_START:
         ESP_LOGI(TAG, "Ethernet Started");
-		status_ethernet("start");
+        status_ethernet("start");
         break;
     case ETHERNET_EVENT_STOP:
         ESP_LOGI(TAG, "Ethernet Stopped");
@@ -80,40 +79,45 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base,
     }
 }
 
-const char *ethernet_status() {
-	if (eth_handle == NULL)
-		return "NA";
+const char *ethernet_status(esp_eth_handle_t eth_handle)
+{
+    if (eth_handle == NULL)
+        return "NA";
 
-#if 0
-	if (!phy_mii_check_link_status()) {
-		return "no link";
-	} else {
-		if (esp_eth_get_speed() == ETH_SPEED_MODE_10M) {
-			if (phy_lan8720_get_duplex_mode() == ETH_MODE_HALFDUPLEX)
-				return "10M, half-duplex";
-			else
-				return "10M, full-duplex";
-		} else {
-			if (phy_lan8720_get_duplex_mode() == ETH_MODE_HALFDUPLEX)
-				return "100M, half-duplex";
-			else
-				return "100M, full-duplex";
-		}
-	}
-#else
-	return "unknown";
-#endif
+    eth_duplex_t duplex;
+    eth_speed_t speed;
+
+    ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle, ETH_CMD_G_DUPLEX, &duplex));
+    ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle, ETH_CMD_G_SPEED, &speed));
+
+    if (speed == ETH_SPEED_10M)
+    {
+        if (duplex == ETH_DUPLEX_HALF)
+            return "10M, half-duplex";
+        else
+            return "10M, full-duplex";
+    }
+    else
+    {
+        if (duplex == ETH_DUPLEX_HALF)
+            return "100M, half-duplex";
+        else
+            return "100M, full-duplex";
+    }
 }
 
-void ethernet_on() {
+static esp_eth_handle_t eth_handle = NULL;
+
+void ethernet_on()
+{
 
 #if CONFIG_ETH_ENABLED
     ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler, NULL));
-
     eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
     eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
     phy_config.phy_addr = CONFIG_CONTROLLER_ETH_PHY_ADDR;
     phy_config.reset_gpio_num = CONFIG_CONTROLLER_ETH_PHY_RST_GPIO;
+
     vTaskDelay(pdMS_TO_TICKS(10));
 
 #if CONFIG_CONTROLLER_USE_INTERNAL_ETHERNET
@@ -130,7 +134,9 @@ void ethernet_on() {
     esp_eth_phy_t *phy = esp_eth_phy_new_dp83848(&phy_config);
 #endif
 #endif
+    eth_handle = NULL;
     esp_eth_config_t config = ETH_DEFAULT_CONFIG(mac, phy);
+
     ESP_ERROR_CHECK(esp_eth_driver_install(&config, &eth_handle));
 
     esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();
@@ -138,17 +144,20 @@ void ethernet_on() {
     // Set default handlers to process TCP/IP stuffs
     ESP_ERROR_CHECK(esp_eth_set_default_handlers(eth_netif));
 
-
     /* attach Ethernet driver to TCP/IP stack */
     ESP_ERROR_CHECK(esp_netif_attach(eth_netif, esp_eth_new_netif_glue(eth_handle)));
+
     /* start Ethernet driver state machine */
     ESP_ERROR_CHECK(esp_eth_start(eth_handle));
+
 #endif
 }
 
-void ethernet_off() {
-	if(eth_handle != NULL) {
-		esp_eth_stop(eth_handle);
-		eth_handle = NULL;
-	}
+void ethernet_off()
+{
+    if (eth_handle != NULL)
+    {
+        esp_eth_stop(eth_handle);
+        eth_handle = NULL;
+    }
 }
