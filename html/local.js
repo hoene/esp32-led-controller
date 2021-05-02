@@ -384,8 +384,9 @@ var api = (function () {
 						console.log("load", e);
 						counter = 50;
 						$.ajax({
-							url: '/rebootfirmware',
+							url: '/reboot',
 							type: 'POST',
+							data: "reboot",
 							cache: false,
 							contentType: false,
 							processData: false,
@@ -441,8 +442,9 @@ var api = (function () {
 						console.log("load", e);
 						counter = 50;
 						$.ajax({
-							url: '/rebootfirmware',
+							url: '/reboot',
 							type: 'POST',
+							data: 'reboot',
 							cache: false,
 							contentType: false,
 							processData: false,

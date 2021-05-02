@@ -8,6 +8,8 @@
 #include <esp_log.h>
 #include <esp_http_server.h>
 #include <string.h>
+#include <esp_partition.h>
+#include <esp_ota_ops.h>
 
 #include "websession.h"
 #include "websocket.h"
@@ -34,8 +36,6 @@ esp_err_t get_handler_jpeg(httpd_req_t *req)
 	return ESP_OK;
 }
 
-// ROUTE_CGI_ARG("/upload", cgiUploadFirmware, &uploadParams),
-// ROUTE_CGI("/rebootfirmware", cgiRebootFirmware),
 // ROUTE_CGI_ARG("*",cgiRedirectToHostname,"192.168.13.1"),
 
 static httpd_handle_t web_handle = NULL;
@@ -101,44 +101,106 @@ esp_err_t get_handler(httpd_req_t *req)
 	return httpd_resp_send_404(req);
 }
 
-#if 0
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
-/* Our URI handler function to be called during POST /uri request */
-esp_err_t post_handler(httpd_req_t *req)
+esp_err_t OTA_reboot_post_handler(httpd_req_t *req)
 {
-	/* Destination buffer for content of HTTP POST request.
-     * httpd_req_recv() accepts char* only, but content could
-     * as well be any binary data (needs type casting).
-     * In case of string data, null termination will be absent, and
-     * content length would give length of string */
-	char content[100];
-
-	/* Truncate if content length larger than the buffer */
-	size_t recv_size = MIN(req->content_len, sizeof(content));
-
-	int ret = httpd_req_recv(req, content, recv_size);
-	if (ret <= 0)
-	{ /* 0 return value indicates connection closed */
-		/* Check if timeout occurred */
-		if (ret == HTTPD_SOCK_ERR_TIMEOUT)
+	char ota_buff[128];
+	int content_length = req->content_len;
+	int recv_len;
+	/* Read the data for the request */
+	if ((recv_len = httpd_req_recv(req, ota_buff, content_length < sizeof(ota_buff) ? content_length : sizeof(ota_buff))) < 0)
+	{
+		if (recv_len == HTTPD_SOCK_ERR_TIMEOUT)
 		{
-			/* In case of timeout one can choose to retry calling
-             * httpd_req_recv(), but to keep it simple, here we
-             * respond with an HTTP 408 (Request Timeout) error */
+			ESP_LOGE(TAG, "socket timeout");
 			httpd_resp_send_408(req);
 		}
-		/* In case of error, returning ESP_FAIL will
-         * ensure that the underlying socket is closed */
+		else
+			ESP_LOGE(TAG, "other error %d", recv_len);
 		return ESP_FAIL;
 	}
 
-	/* Send a simple response */
-	const char resp[] = "URI POST Response";
-	httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+	httpd_resp_send(req, "done", 5);
+	esp_restart();
 	return ESP_OK;
 }
-#endif
+
+/* Receive .Bin file */
+esp_err_t OTA_update_post_handler(httpd_req_t *req)
+{
+	esp_ota_handle_t ota_handle;
+
+	char ota_buff[128];
+	int content_length = req->content_len;
+	int content_received = 0;
+	int recv_len;
+	bool is_req_body_started = false;
+	const esp_partition_t *update_partition = esp_ota_get_next_update_partition(NULL);
+
+	do
+	{
+		/* Read the data for the request */
+		if ((recv_len = httpd_req_recv(req, ota_buff, content_length < sizeof(ota_buff) ? content_length : sizeof(ota_buff))) < 0)
+		{
+			if (recv_len == HTTPD_SOCK_ERR_TIMEOUT)
+			{
+				ESP_LOGE(TAG, "socket timeout");
+				httpd_resp_send_408(req);
+			}
+			else
+				ESP_LOGE(TAG, "other error %d", recv_len);
+			return ESP_FAIL;
+		}
+		//		printf("OTA RX: %d of %d : %p %s\r\n", content_received, content_length, ota_buff, ota_buff);
+
+		// Is this the first data we are receiving
+		// If so, it will have the information in the header we need.
+		if (!is_req_body_started)
+		{
+			is_req_body_started = true;
+			esp_err_t err = esp_ota_begin(update_partition, OTA_SIZE_UNKNOWN, &ota_handle);
+			if (err != ESP_OK)
+			{
+				ESP_LOGE(TAG, "Error With OTA Begin, Cancelling OTA\r\n");
+				httpd_resp_send_500(req);
+				return ESP_FAIL;
+			}
+			else
+			{
+				ESP_LOGD(TAG, "Writing to partition subtype %d at offset 0x%x", update_partition->subtype, update_partition->address);
+			}
+		}
+		// Write OTA data
+		esp_ota_write(ota_handle, ota_buff, recv_len);
+		content_received += recv_len;
+	} while (recv_len > 0 && content_received < content_length);
+
+	if (esp_ota_end(ota_handle) == ESP_OK)
+	{
+		// Lets update the partition
+		if (esp_ota_set_boot_partition(update_partition) == ESP_OK)
+		{
+			const esp_partition_t *boot_partition = esp_ota_get_boot_partition();
+
+			ESP_LOGI(TAG, "Next boot partition subtype %d at offset 0x%x", boot_partition->subtype, boot_partition->address);
+			ESP_LOGI(TAG, "Please restart system");
+			httpd_resp_send(req, "done", 5);
+		}
+		else
+		{
+			ESP_LOGE(TAG, "OTA Flash Error");
+			httpd_resp_send_500(req);
+			return ESP_FAIL;
+		}
+	}
+	else
+	{
+		ESP_LOGI(TAG, "OTA End Error");
+		httpd_resp_send_500(req);
+		return ESP_FAIL;
+	}
+
+	return ESP_OK;
+}
 
 /* URI handler structure for GET /uri */
 static const httpd_uri_t uri_get = {
@@ -153,25 +215,28 @@ static const httpd_uri_t uri_get_jpeg = {
 	.handler = get_handler_jpeg,
 	.user_ctx = NULL};
 
-#if 0
-/* URI handler structure for POST /uri */
-static const httpd_uri_t uri_post = {
-	.uri = "/uri",
+static const httpd_uri_t OTA_update = {
+	.uri = "/upload",
 	.method = HTTP_POST,
-	.handler = post_handler,
+	.handler = OTA_update_post_handler,
 	.user_ctx = NULL};
-#endif
+
+static const httpd_uri_t OTA_reboot = {
+	.uri = "/reboot",
+	.method = HTTP_POST,
+	.handler = OTA_reboot_post_handler,
+	.user_ctx = NULL};
 
 /* Function for starting the webserver */
 void web_on()
 {
 	/* Generate default configuration */
 	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-	config.max_uri_handlers = 4;
+	//	config.max_uri_handlers = 5;
 	config.uri_match_fn = httpd_uri_match_wildcard;
 	config.open_fn = websession_add;
 	config.close_fn = websession_remove;
-	config.stack_size = 1024*6;
+	config.stack_size = 1024 * 6;
 
 	/* Empty handle to esp_http_server */
 	assert(!web_handle);
@@ -181,11 +246,11 @@ void web_on()
 	{
 		websocket_on(web_handle);
 		/* Register URI handlers */
-		httpd_register_uri_handler(web_handle, &uri_get_jpeg);
-		httpd_register_uri_handler(web_handle, &uri_get);
-		//		httpd_register_uri_handler(web_handle, &uri_post);
+		ESP_ERROR_CHECK(httpd_register_uri_handler(web_handle, &uri_get_jpeg));
+		ESP_ERROR_CHECK(httpd_register_uri_handler(web_handle, &uri_get));
+		ESP_ERROR_CHECK(httpd_register_uri_handler(web_handle, &OTA_update));
+		ESP_ERROR_CHECK(httpd_register_uri_handler(web_handle, &OTA_reboot));
 	}
-
 	// TODO		espFsInit((void*) (webpages_espfs_start));
 	// TODO		captdnsInit();
 }

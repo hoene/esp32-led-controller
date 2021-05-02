@@ -117,6 +117,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
     break;
 
   case SYSTEM_EVENT_STA_WPS_ER_PIN:
+  case SYSTEM_EVENT_STA_WPS_ER_PBC_OVERLAP:
     // WPS is not supported, yes
     break;
 
