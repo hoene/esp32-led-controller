@@ -13,6 +13,7 @@
 #include <freertos/task.h>
 #include <lwip/err.h>
 #include <lwip/sys.h>
+#include <lwip/ip4_addr.h>
 #include <mdns.h>
 #include <string.h>
 #include "config.h"
@@ -229,7 +230,21 @@ void wifi_on()
 {
   ap_connected = 0;
 
-  esp_netif_create_default_wifi_ap();
+  esp_netif_config_t ap_cfg = ESP_NETIF_DEFAULT_WIFI_AP();
+  esp_netif_inherent_config_t base;
+  base = *ap_cfg.base;
+  ap_cfg.base = &base;
+  esp_netif_ip_info_t info;
+  info = *base.ip_info;
+  base.ip_info = &info;
+  IP4_ADDR(&info.ip, 192, 168, 14, 1);
+  IP4_ADDR(&info.gw, 192, 168, 14, 1);
+  IP4_ADDR(&info.netmask, 255, 255, 255, 0);
+  esp_netif_t *netif = esp_netif_new(&ap_cfg);
+  assert(netif);
+
+  esp_netif_attach_wifi_ap(netif);
+  esp_wifi_set_default_wifi_ap_handlers();
 
   esp_netif_create_default_wifi_sta();
 
