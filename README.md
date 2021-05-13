@@ -138,6 +138,10 @@ Or if you want to play a movie, call
 
 > ffmpeg filme.mp4 -framerate 2 -vf scale=16:8 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.130:1616/
 
+## Support
+
+We do not provide any support for the LED controller on this site but only to our customers. Please do not raise support request in the issue tickets - these are for bugs only. Thank you for your understanding.
+
 ## Disclaimer
 
 The file ws2812fx.c is based on the work of <a href="https://github.com/kitesurfer1404/WS2812FX">Harm Aldick (kitesurfer1404)</a>. The remaining source code is by <christian.hoene@symonics.com>, <a href="https://symonics.com/">Symonics GmbH</a>, and available under AGPL V3 license. The inital work has been funded by German <a href="https://www.bmbf.de">Federal Ministry of Education and Research</a> within the Fastmusic project. 
