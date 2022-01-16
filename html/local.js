@@ -8,6 +8,8 @@ var api = (function () {
 
 	var led_lines = 1;
 
+	var disconnectTimeout;
+
 	function loading(on) {
 		if (on)
 			$("#loading").show();
@@ -217,6 +219,7 @@ var api = (function () {
 	}
 
 	function doInit() {
+		disconnectTimeout = null;
 		websocket = new WebSocket("ws://" + window.location.host + "/ws");
 		websocket.onopen = function (evt) {
 			onOpen(evt);
@@ -228,10 +231,8 @@ var api = (function () {
 			onMessage(evt);
 		};
 		websocket.onerror = function (evt) {
-			// console.log(evt);
-			// statusError("The browser reports<br/>" + evt);
+			onClose(evt);
 		};
-
 	}
 
 	function doApplyNetwork() {
@@ -306,13 +307,17 @@ var api = (function () {
 	}
 
 	function onOpen(evt) {
+		$('#modalDisconnect').modal('hide');
 		loading(false);
 		doSend({ id: "hello" });
 	}
 
 	function onClose(evt) {
+		if (disconnectTimeout)
+			return;
 		console.log("disconnected");
 		$('#modalDisconnect').modal('show');
+		disconnectTimeout = setTimeout(doInit, 2000);
 	}
 
 	function onMessage(evt) {

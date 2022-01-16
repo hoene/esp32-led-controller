@@ -237,6 +237,7 @@ void web_on()
 	config.open_fn = websession_add;
 	config.close_fn = websession_remove;
 	config.stack_size = 1024 * 6;
+	config.lru_purge_enable = true;
 
 	/* Empty handle to esp_http_server */
 	assert(!web_handle);
