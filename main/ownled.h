@@ -20,7 +20,7 @@ extern void ownled_prepare();
 extern void ownled_send();
 extern esp_err_t ownled_isFinished();
 extern void ownled_free();
-extern void ownled_setLED(uint8_t c, uint16_t pos, uint8_t sw);
+extern void ownled_setByte(uint8_t c, uint16_t pos, uint8_t sw);
 extern void ownled_setPixel(uint8_t c, uint16_t pos, uint8_t r, uint8_t g,
                             uint8_t b);
 extern uint8_t ownled_getChannels();
@@ -47,7 +47,9 @@ enum OWNLED_COLOR_ORDER {
   OWNLED_BRG_FB,
   OWNLED_BGR_FB,
   OWNLED_BW,
-  OWNLED_BW_FB
+  OWNLED_BW_FB,
+  OWNLED_48,
+  OWNLED_48_FB
 };
 extern enum OWNLED_COLOR_ORDER ownled_getColorOrder();
 extern esp_err_t ownled_setColorOrder(enum OWNLED_COLOR_ORDER order);

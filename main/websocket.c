@@ -87,6 +87,12 @@ static esp_err_t echo_handler(httpd_req_t *req)
 
 static esp_err_t echo_handler(httpd_req_t *req)
 {
+    if (req->method == HTTP_GET)
+    {
+        ESP_LOGI(TAG, "Handshake done, the new connection was opened");
+        return ESP_OK;
+    }
+
     ESP_LOGI(TAG, "echo handler");
     uint8_t buf[1600] = {0};
     httpd_ws_frame_t ws_pkt;
@@ -99,7 +105,7 @@ static esp_err_t echo_handler(httpd_req_t *req)
         ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
         return ret;
     }
-    ESP_LOGI(TAG, "Got packet with message: %s", ws_pkt.payload);
+    ESP_LOGI(TAG, "Got packet with message: %s %d %d", ws_pkt.payload, ws_pkt.len, ws_pkt.fragmented);
     ESP_LOGI(TAG, "Packet type: %d", ws_pkt.type);
     if (ws_pkt.fragmented)
     {

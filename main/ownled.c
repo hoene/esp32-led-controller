@@ -19,8 +19,14 @@
 #include <string.h>
 #include "sdkconfig.h"
 
-#define RGB_BYTES (3)
-#define RGB_BITS (24)
+#include "gamma.c"
+
+#define RGB_BYTES_8 (1)
+#define RGB_BYTES_24 (3)
+#define RGB_BYTES_48 (6)
+#define RGB_BITS_8 (RGB_BYTES_8 * 8)
+#define RGB_BITS_24 (RGB_BYTES_24 * 8)
+#define RGB_BITS_48 (RGB_BYTES_48 * 8)
 
 static const char *TAG = "#ownled";
 
@@ -58,7 +64,11 @@ static enum OWNLED_COLOR_ORDER color_order = OWNLED_GRB;
  * RMT structure for one (high) and zero (low) impulse initialized by default
  * values
  */
-IRAM_ATTR rmt_item32_t cs8812_high = {.duration0 = DEFAULT_PULSE_LENGTH * DEFAULT_ONE_PULSE_LENGTH, .level0 = 1, .duration1 = DEFAULT_PULSE_LENGTH * (1 - DEFAULT_ONE_PULSE_LENGTH), .level1 = 0};
+IRAM_ATTR rmt_item32_t cs8812_high = {
+	.duration0 = DEFAULT_PULSE_LENGTH * DEFAULT_ONE_PULSE_LENGTH,
+	.level0 = 1,
+	.duration1 = DEFAULT_PULSE_LENGTH * (1 - DEFAULT_ONE_PULSE_LENGTH),
+	.level1 = 0};
 
 IRAM_ATTR rmt_item32_t cs8812_low = {
 	.duration0 = DEFAULT_PULSE_LENGTH * DEFAULT_ZERO_PULSE_LENGTH,
@@ -110,7 +120,7 @@ uint8_t ownled_get_pulse_zero()
  */
 
 #define MAXIMAL_LINES (8)
-#define LEDS_PER_LINE (616)
+#define BYTES_PER_LINE (616 * 3)
 
 extern struct FASTRMI_DATA
 {
@@ -122,7 +132,7 @@ extern struct FASTRMI_DATA
 	uint8_t *input;
 } fastrmi_para[MAXIMAL_LINES];
 
-extern uint8_t fastrmi_bytes[LEDS_PER_LINE * RGB_BYTES * MAXIMAL_LINES];
+extern uint8_t fastrmi_bytes[BYTES_PER_LINE * MAXIMAL_LINES];
 
 extern int32_t _l5_counter, _l5_flags;
 
@@ -135,7 +145,7 @@ static intr_handle_t isr_handle;
 static struct
 {
 	rmt_channel_t rmtChannel;
-	uint16_t numPixels;
+	uint16_t numBytes;
 	uint8_t *frameBuffer;
 	uint8_t *rmtBuffer;
 } lines[MAXIMAL_LINES];
@@ -144,27 +154,34 @@ static struct
  * settings of different hardware
  */
 
-static const uint8_t version_gpio[CONFIG_CONTROLLER_LED_LINES] = { CONFIG_CONTROLLER_LED_LINE0
+static const uint8_t version_gpio[CONFIG_CONTROLLER_LED_LINES] = {CONFIG_CONTROLLER_LED_LINE0
 #if CONFIG_CONTROLLER_LED_LINES >= 2
-	,CONFIG_CONTROLLER_LED_LINE1
+																  ,
+																  CONFIG_CONTROLLER_LED_LINE1
 #endif
 #if CONFIG_CONTROLLER_LED_LINES >= 3
-	,CONFIG_CONTROLLER_LED_LINE2
+																  ,
+																  CONFIG_CONTROLLER_LED_LINE2
 #endif
 #if CONFIG_CONTROLLER_LED_LINES >= 4
-	,CONFIG_CONTROLLER_LED_LINE3
+																  ,
+																  CONFIG_CONTROLLER_LED_LINE3
 #endif
 #if CONFIG_CONTROLLER_LED_LINES >= 5
-	,CONFIG_CONTROLLER_LED_LINE4
+																  ,
+																  CONFIG_CONTROLLER_LED_LINE4
 #endif
 #if CONFIG_CONTROLLER_LED_LINES >= 6
-	,CONFIG_CONTROLLER_LED_LINE5
+																  ,
+																  CONFIG_CONTROLLER_LED_LINE5
 #endif
 #if CONFIG_CONTROLLER_LED_LINES >= 7
-	,CONFIG_CONTROLLER_LED_LINE6
+																  ,
+																  CONFIG_CONTROLLER_LED_LINE6
 #endif
 #if CONFIG_CONTROLLER_LED_LINES >= 8
-	,CONFIG_CONTROLLER_LED_LINE7
+																  ,
+																  CONFIG_CONTROLLER_LED_LINE7
 #endif
 
 };
@@ -206,7 +223,7 @@ void ownled_init()
 
 		lines[i].rmtChannel = i * ownled_getBlocksize();
 		lines[i].frameBuffer = NULL;
-		lines[i].numPixels = 0;
+		lines[i].numBytes = 0;
 
 		rmt_config_t config = {.rmt_mode = RMT_MODE_TX, .channel = lines[i].rmtChannel,
 							   .clk_div = 1, // 80 MHz (APB CLK typical)
@@ -259,6 +276,8 @@ extern esp_err_t ownled_setColorOrder(enum OWNLED_COLOR_ORDER order)
 	case OWNLED_BGR_FB:
 	case OWNLED_BW:
 	case OWNLED_BW_FB:
+	case OWNLED_48:
+	case OWNLED_48_FB:
 		color_order = order;
 		ESP_LOGI(TAG, "set led order %d=%d", color_order, order);
 		return ESP_OK;
@@ -282,9 +301,9 @@ void ownled_set_default()
 	//	color_order = OWNLED_GRB;
 }
 
-extern void ownled_setLED(uint8_t c, uint16_t pos, uint8_t sw)
+extern void ownled_setBytes(uint8_t c, uint16_t pos, uint8_t sw)
 {
-	if (c >= MAXIMAL_LINES || pos >= lines[c].numPixels * RGB_BYTES)
+	if (c >= MAXIMAL_LINES || pos >= lines[c].numBytes)
 		return;
 	uint8_t *s = lines[c].frameBuffer;
 	if (s == NULL)
@@ -294,20 +313,26 @@ extern void ownled_setLED(uint8_t c, uint16_t pos, uint8_t sw)
 	s[pos] = sw;
 }
 
-extern void ownled_setPixel(uint8_t c, uint16_t pos, uint8_t r, uint8_t g,
-							uint8_t b)
+extern void ownled_setPixel(uint8_t c, uint16_t pos, uint8_t g, uint8_t b,
+							uint8_t r)
 {
-	if (c >= MAXIMAL_LINES || pos >= lines[c].numPixels)
+	if (c >= MAXIMAL_LINES)
 		return;
+
 	uint8_t *s = lines[c].frameBuffer;
 	if (s == NULL)
 	{
 		s = lines[c].rmtBuffer;
 	}
+
 	if (color_order == OWNLED_BW || color_order == OWNLED_BW_FB)
 	{
+		if (pos >= lines[c].numBytes)
+			return;
+
 		s += pos;
-		switch (pos % 12)
+
+		switch (pos % 12) /* warum? */
 		{
 		case 6:
 		case 9:
@@ -319,14 +344,35 @@ extern void ownled_setPixel(uint8_t c, uint16_t pos, uint8_t r, uint8_t g,
 			break;
 		}
 	}
+	else if (color_order == OWNLED_48 || color_order == OWNLED_48_FB)
+	{
+		if (pos * RGB_BYTES_48 >= lines[c].numBytes)
+			return;
+
+		s += pos * RGB_BYTES_48;
+	}
 	else
-		s += pos * RGB_BYTES;
+	{
+		if (pos * RGB_BYTES_24 >= lines[c].numBytes)
+			return;
+
+		s += pos * RGB_BYTES_24;
+	}
 
 	switch (color_order)
 	{
 	case OWNLED_BW:
 	case OWNLED_BW_FB:
-		s[0] = (((uint16_t)r) + g + b) / 3;
+		s[0] = (2126 * r + 7152 * g + 722 * b) / 10000;
+		break;
+	case OWNLED_48:
+	case OWNLED_48_FB:
+		s[0] = lookupGamma[r] >> 8;
+		s[1] = lookupGamma[r];
+		s[2] = lookupGamma[g] >> 8;
+		s[3] = lookupGamma[g];
+		s[4] = lookupGamma[b] >> 8;
+		s[5] = lookupGamma[b];
 		break;
 	case OWNLED_RGB:
 	case OWNLED_RGB_FB:
@@ -377,7 +423,7 @@ void ownled_send()
 		if (lines[i].frameBuffer)
 		{
 			memcpy(lines[i].rmtBuffer, lines[i].frameBuffer,
-				   lines[i].numPixels * RGB_BYTES);
+				   lines[i].numBytes);
 		}
 	}
 
@@ -395,9 +441,16 @@ void ownled_send()
 				 lines[i].rmtChannel, _l5_flags, fastrmi_para[i].baseAddress,
 				 fastrmi_para[i].mask, fastrmi_para[i].counter,
 				 fastrmi_para[i].length, src, dst, &RMT.conf_ch[i]);
-		for (int8_t j = bytesPre; j; j--)
+
+		for (int8_t j = 0; j < bytesPre; j++)
 		{
 			uint8_t s = *src++;
+			if (j == lines[i].numBytes)
+			{
+				dst->val = 0;
+				break;
+			}
+
 			*dst++ = s & 0x80 ? cs8812_high : cs8812_low;
 			*dst++ = s & 0x40 ? cs8812_high : cs8812_low;
 			*dst++ = s & 0x20 ? cs8812_high : cs8812_low;
@@ -409,9 +462,8 @@ void ownled_send()
 		}
 
 		/** fill remaining bytes into fastrmi buffer */
-		int bytesPost = lines[i].numPixels * RGB_BYTES + 1;
 		fastrmi_para[i].counter = bytesPre;
-		fastrmi_para[i].length = bytesPost;
+		fastrmi_para[i].length = lines[i].numBytes;
 		fastrmi_para[i].baseAddress = 0x3ff56800 + RMT_MEM_BLOCK_BYTE_NUM * lines[i].rmtChannel;
 		fastrmi_para[i].mask =
 			(ownled_getBlocksize() *
@@ -435,14 +487,12 @@ esp_err_t ownled_isFinished()
 	return ESP_OK;
 }
 
-void ownled_setSize(uint8_t channel, uint16_t numPixels)
+void ownled_setSize(uint8_t channel, uint16_t _numPixels)
 {
+	uint16_t numBytes = 0;
+
 	if (channel >= ownled_getChannels())
 		return;
-	if (numPixels > LEDS_PER_LINE)
-		numPixels = LEDS_PER_LINE * ownled_getBlocksize();
-
-	lines[channel].numPixels = numPixels;
 
 	free(lines[channel].frameBuffer);
 	switch (color_order)
@@ -453,8 +503,16 @@ void ownled_setSize(uint8_t channel, uint16_t numPixels)
 	case OWNLED_GBR:
 	case OWNLED_BRG:
 	case OWNLED_BGR:
+		lines[channel].frameBuffer = NULL;
+		numBytes = _numPixels * RGB_BYTES_24;
+		break;
 	case OWNLED_BW:
 		lines[channel].frameBuffer = NULL;
+		numBytes = _numPixels * RGB_BYTES_8;
+		break;
+	case OWNLED_48:
+		lines[channel].frameBuffer = NULL;
+		numBytes = _numPixels * RGB_BYTES_48;
 		break;
 	case OWNLED_RGB_FB:
 	case OWNLED_RBG_FB:
@@ -462,16 +520,28 @@ void ownled_setSize(uint8_t channel, uint16_t numPixels)
 	case OWNLED_GBR_FB:
 	case OWNLED_BRG_FB:
 	case OWNLED_BGR_FB:
-		lines[channel].frameBuffer = malloc(numPixels * RGB_BYTES);
-		memset(lines[channel].frameBuffer, 0, numPixels * RGB_BYTES);
+		numBytes = _numPixels * RGB_BYTES_24;
+		lines[channel].frameBuffer = malloc(numBytes);
+		memset(lines[channel].frameBuffer, 0, numBytes);
+		break;
+	case OWNLED_48_FB:
+		numBytes = _numPixels * RGB_BYTES_48;
+		lines[channel].frameBuffer = malloc(numBytes);
+		memset(lines[channel].frameBuffer, 0, numBytes);
 		break;
 	case OWNLED_BW_FB:
-		lines[channel].frameBuffer = malloc(numPixels);
-		memset(lines[channel].frameBuffer, 0, numPixels);
+		numBytes = _numPixels * RGB_BYTES_8;
+		lines[channel].frameBuffer = malloc(numBytes);
+		memset(lines[channel].frameBuffer, 0, numBytes);
 		break;
 	}
 
-	int blocksize = ownled_getBlocksize() * RGB_BYTES * LEDS_PER_LINE;
+	if (numBytes > BYTES_PER_LINE)
+		numBytes = BYTES_PER_LINE;
+	lines[channel].numBytes = numBytes;
+
+	/* TODO Warum der Scheiss hier? */
+	int blocksize = ownled_getBlocksize() * BYTES_PER_LINE;
 	lines[channel].rmtBuffer = fastrmi_bytes + blocksize * channel;
 	ESP_LOGD(TAG, "rmtBuffer %p %p %d", fastrmi_bytes, lines[channel].rmtBuffer,
 			 blocksize);
@@ -488,7 +558,7 @@ void ownled_free()
 		ESP_ERROR_CHECK(rmt_set_tx_intr_en(lines[i].rmtChannel, false));
 		free(lines[i].frameBuffer);
 		lines[i].frameBuffer = NULL;
-		lines[i].numPixels = 0;
+		lines[i].numBytes = 0;
 	}
 	rmt_isr_deregister(isr_handle);
 }

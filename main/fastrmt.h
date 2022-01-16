@@ -14,6 +14,5 @@
 
 #define FASTRMT_MAXIMAL_LINES (8)
 #define FASTRMT_MINIMAL_LEDS (616)
-#define FASTRMT_RGB_BYTES (3)
 
 #endif /* MAIN_FASTRMT_H_ */

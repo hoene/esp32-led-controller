@@ -39,7 +39,7 @@ _l5_flags:
  * some structure as FASTRMI_DATA in ownled.c
  */
 #define MAXIMAL_LINES 8
-#define LEDS_PER_LINE 616
+#define BYTES_PER_LINE (616*3)
 
 #define DATA_COUNTER_OFFSET 0
 #define DATA_SIZE_OFFSET 2
@@ -55,7 +55,7 @@ fastrmi_para_end:
     .global     fastrmi_para
 
 fastrmi_bytes:
-	.space		LEDS_PER_LINE * 3 * MAXIMAL_LINES, 0
+	.space		BYTES_PER_LINE * MAXIMAL_LINES, 0
 	 .global     fastrmi_bytes
 
 /*
