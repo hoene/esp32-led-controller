@@ -87,7 +87,7 @@ const char *ethernet_status(esp_eth_handle_t eth_handle)
     eth_duplex_t duplex;
     eth_speed_t speed;
 
-    ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle, ETH_CMD_G_DUPLEX, &duplex));
+    ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle, ETH_CMD_G_DUPLEX_MODE, &duplex));
     ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle, ETH_CMD_G_SPEED, &speed));
 
     if (speed == ETH_SPEED_10M)
