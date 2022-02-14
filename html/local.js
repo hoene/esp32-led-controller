@@ -170,7 +170,7 @@ var api = (function () {
 			$("#l" + i + "op").val(status.leds[i].op);
 		}
 
-		setPlaylistLines(status.playlist.length);
+/*		setPlaylistLines(status.playlist.length);
 		for (i = 0; i < status.playlist.length; i++) {
 			if (status.playlist[i].mode == 0) {
 				$("#p" + i).hide();
@@ -182,7 +182,7 @@ var api = (function () {
 				$("#p" + i + "mode").val(status.playlist[i].mode);
 			}
 		}
-
+*/
 
 		$("#colorContrast1").val(status.contrast);
 		$("#colorLightness1").val(status.brightness);

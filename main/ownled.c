@@ -100,7 +100,7 @@ esp_err_t ownled_set_pulses(uint32_t frequency, uint8_t one, uint8_t zero)
 uint32_t ownled_get_pulse_frequency()
 {
 	double pulse_length = cs8812_high.duration0 + cs8812_high.duration1;
-	return 1000. * round(FREQ_INPUT / (pulse_length * 1000.));
+	return 10000. * round(FREQ_INPUT / (pulse_length * 10000.));
 }
 
 uint8_t ownled_get_pulse_one()

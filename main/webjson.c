@@ -227,7 +227,7 @@ static cJSON *error_to_json(const char *error)
     if (json == NULL)
         return NULL;
 
-    cJSON_AddItemToObject(json, "id", cJSON_CreateStringReference("config"));
+    cJSON_AddItemToObject(json, "id", cJSON_CreateStringReference("error"));
     cJSON_AddItemToObject(json, "cause", cJSON_CreateStringReference(error));
     ESP_LOGE(TAG, "error %s", error);
     return json;
