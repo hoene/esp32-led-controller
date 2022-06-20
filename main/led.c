@@ -41,6 +41,8 @@ static float diagonale(float x, float y) {
 	return sqrtf(x * x + y * y);
 }
 
+static uint8_t cmap[UINT8_MAX+1];
+
 /**
  * return the number of led lines support by this hardware
  */
@@ -166,6 +168,10 @@ void led_set_color(uint8_t c, uint16_t p, uint8_t r, uint8_t g, uint8_t b) {
 	r = FLOATtoBYTE(fr);
 	g = FLOATtoBYTE(fg);
 	b = FLOATtoBYTE(fb);
+
+	r = cmap[r];
+	g = cmap[g];
+	b = cmap[b];
 
 	if (p == led_config.channel[c].black[0]
 			|| p == led_config.channel[c].black[1]
@@ -774,6 +780,25 @@ static void task(void *args) {
  * init the led strips and starts a thread for handling them
  */
 void led_on() {
+
+	int16_t last = 0x200; // something larger than UINT8_MAX
+	for(int16_t c=UINT8_MAX;c>=0;c--) {
+		uint8_t ones=1;
+		uint8_t l=0;
+		for(uint8_t b=0x80;b>0 && ones>0;b>>=1) {
+			if((c & b) !=0) {
+				l|=b;
+				ones--;
+			}
+		}
+		if(c - l < last - c) { // rounding to lower value is smaller than to previous larger one
+			cmap[c]=l;
+			last=l;
+		}
+		else {
+			cmap[c]=last;
+		}
+	}
 
 	led_counter = 0;
 	ownled_init();

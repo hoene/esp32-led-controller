@@ -36,6 +36,7 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "sdkconfig.h"
+#include "lwip/ip_addr.h"
 
 #include "status.h"
 
