@@ -415,6 +415,14 @@ static const char *parseConfigLed(cJSON *root)
     if (!refresh_rate || refresh_rate->type != cJSON_Number)
         return "no refresh_rate";
 
+    cJSON *artnet_width = cJSON_GetObjectItem(root, "artnet_width");
+    if (!artnet_width || artnet_width->type != cJSON_Number)
+        return "no artnet_width";
+
+    cJSON *artnet_universe_offset = cJSON_GetObjectItem(root, "artnet_universe_offset");
+    if (!artnet_universe_offset || artnet_universe_offset->type != cJSON_Number)
+        return "no artnet_universe_offset";
+
     cJSON *leds = cJSON_GetObjectItem(root, "leds");
     if (!leds || leds->type != cJSON_Array)
         return "no leds array";
@@ -425,6 +433,8 @@ static const char *parseConfigLed(cJSON *root)
     }
     config_set_prefix_leds(prefix_leds->valueint);
     config_set_refresh_rate(refresh_rate->valueint);
+    config_set_artnet_width(artnet_width->valueint);
+    config_set_artnet_universe_offset(artnet_universe_offset->valueint);
 
     int size = cJSON_GetArraySize(leds);
     if (size > ownled_getChannels())

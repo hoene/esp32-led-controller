@@ -631,6 +631,7 @@ void config_set_refresh_rate(int16_t value) {
 void config_set_artnet_width(uint16_t val) {
 	led_config.artnet_width = val;
 }
+
 void config_set_artnet_universe_offset(uint16_t val) {
 	led_config.artnet_universe_offset = val;
 }

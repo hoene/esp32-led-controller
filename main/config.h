@@ -55,7 +55,7 @@ void config_set_prefix_leds(uint8_t);
 void config_set_refresh_rate(int16_t);
 
 void config_set_artnet_width(uint16_t);
-void config_set_artnet_universe_offnet(uint16_t);
+void config_set_artnet_universe_offset(uint16_t);
 uint16_t config_get_artnet_width();
 uint16_t config_get_artnet_universe_offset();
 

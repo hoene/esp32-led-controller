@@ -77,6 +77,11 @@ static int artnet_parse(uint8_t *buffer, uint16_t length) {
     return -1;
   }
 
+  if (buffer[8] == 0x00 && buffer[9] == 0x52) {
+    led_trigger();
+    return -1;
+  }
+
   if (buffer[8] != 0x00 || buffer[9] != 0x50) {
     ESP_LOGE(TAG, "unknown Art-Net protocol %02X%02X", buffer[8], buffer[9]);
     return -1;
@@ -88,8 +93,8 @@ static int artnet_parse(uint8_t *buffer, uint16_t length) {
     return -1;
   }
 
-  int16_t sequence = buffer[12];
-  //	int8_t physical = buffer[13];
+  uint8_t sequence = buffer[12];
+  //  uint8_t physical = buffer[13];
   uint16_t universe = buffer[14] + buffer[15] * 256;
   uint16_t dmxlen = buffer[16] * 256 + buffer[17];
 
@@ -106,30 +111,20 @@ static int artnet_parse(uint8_t *buffer, uint16_t length) {
   }
   artnet_sequence[universe] = sequence;
 
-  uint16_t width = config_get_artnet_width() * 3;
-
-  if (width < 512) {
-    uint16_t lines = 512 / width;
-    uint16_t y = universe * lines;
-    uint16_t x = 0;
-    for (int i = 0; i < dmxlen - 2; i += 3) {
-      led_rgb(x, y, buffer[18 + i], buffer[19 + i], buffer[20 + i]);
-      x++;
-      if (x == width)
-        y++;
-    }
-  } else {
-    uint16_t lines = (width - 1) / 510 + 1;
-    uint16_t y = universe / lines;
-    uint16_t x = (universe % lines) * 510;
-    for (int i = 0; i < dmxlen - 2; i += 3) {
-      led_rgb(x + i, y, buffer[18 + i], buffer[19 + i], buffer[20 + i]);
+  uint16_t width = config_get_artnet_width();
+  uint16_t x = universe * 170;
+  uint16_t y = x / width;
+  x = x % width;
+  for (int i = 0; i < dmxlen - 2; i += 3) {
+    led_rgb(x, y, buffer[19 + i], buffer[18 + i], buffer[20 + i]);
+    x++;
+    if (x == width) {
+      y++;
+      x = 0;
     }
   }
 
   status_artnet_good();
-  //	ESP_LOGI(TAG, "Art-Net %d %d %d %d",universe,dmxlen,sequence,physical);
-  led_trigger();
   status_rtp_last(buffer, length);
   return 0;
 }
