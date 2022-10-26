@@ -116,7 +116,7 @@ static int artnet_parse(uint8_t *buffer, uint16_t length) {
   uint16_t y = x / width;
   x = x % width;
   for (int i = 0; i < dmxlen - 2; i += 3) {
-    led_rgb(x, y, buffer[19 + i], buffer[18 + i], buffer[20 + i]);
+    led_rgb_rtp(x, y, buffer[19 + i], buffer[18 + i], buffer[20 + i]);
     x++;
     if (x == width) {
       y++;

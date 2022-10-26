@@ -259,9 +259,12 @@ static void led_channel_rgb(int c, int x, int y, uint8_t r, uint8_t g,
 	led_set_color(c, x + y * sx, r, g, b);
 }
 
-void led_rgb(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
-	for (int c = 0; c < led_get_max_lines(); c++)
-		led_channel_rgb(c, x, y, r, g, b);
+void led_rgb_rtp(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
+	for (int c = 0; c < led_get_max_lines(); c++) {
+		if (led_config.channel[c].mode == LED_MODE_NETWORK) {
+			led_channel_rgb(c, x, y, r, g, b);
+		}
+	}
 }
 
 void led_channel_block(int c, int x, int y, uint8_t *r, uint8_t *g, uint8_t *b) {

@@ -6,6 +6,8 @@
 
 #include <esp_err.h>
 #include <esp_log.h>
+#include <stdio.h>
+#include <sys/socket.h>
 
 static const char *TAG = strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__;
 
@@ -74,6 +76,8 @@ void websession_remove(httpd_handle_t hd, int sockfd)
 {
 
 	ESP_LOGI(TAG, "session rm %p %d", hd, sockfd);
+
+	close(sockfd);
 
 	struct WebsessionNode *previous = NULL;
 	struct WebsessionNode *n = websessions;

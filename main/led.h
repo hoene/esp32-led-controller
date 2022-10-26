@@ -158,7 +158,7 @@ void led_cube(float x, float y, float z);
 void led_cube2(int d, float x, float y, float z);
 void led_block(int x, int y, uint8_t *r, uint8_t *g, uint8_t *b);
 void led_set_color(uint8_t c, uint16_t p, uint8_t r, uint8_t g, uint8_t b);
-void led_rgb(int x, int y, uint8_t r, uint8_t g, uint8_t b);
+void led_rgb_rtp(int x, int y, uint8_t r, uint8_t g, uint8_t b);
 void led_trigger();
 
 #endif /* MAIN_LED_H_ */
