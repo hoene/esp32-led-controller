@@ -501,6 +501,8 @@ void ownled_setSize(uint8_t channel, uint16_t _numPixels) {
   if (numBytes > BYTES_PER_LINE)
     numBytes = BYTES_PER_LINE;
   lines[channel].numBytes = numBytes;
+  if(lines[channel].frameBuffer)
+    lines[channel].frameBuffer[0] = 0x01;   // sync bit in prefix leds
 
   /* TODO Warum der Scheiss hier? */
   int blocksize = ownled_getBlocksize() * BYTES_PER_LINE;
@@ -508,6 +510,8 @@ void ownled_setSize(uint8_t channel, uint16_t _numPixels) {
   ESP_LOGD(TAG, "rmtBuffer %p %p %d", fastrmi_bytes, lines[channel].rmtBuffer,
            blocksize);
   memset(lines[channel].rmtBuffer, 0, blocksize);
+  lines[channel].rmtBuffer[0] = 0x01; // sync bit in prefix leds
+
 }
 
 void ownled_free() {
