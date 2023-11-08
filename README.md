@@ -132,11 +132,11 @@ And finally, the Status card give you an overview on the entire system. Its is o
 
 On Linux, to stream from your desktop to the LED controller call - after adapting the parameter - the command:
 
-> ffmpeg -f x11grab -framerate 2 -i :0.0+0,0 -vf scale=32:32 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.130:1616/
+> ffmpeg -f x11grab -framerate 2 -i :0.0+0,0 -vf scale=32:32 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.130:6454/
 
 Or if you want to play a movie, call
 
-> ffmpeg filme.mp4 -framerate 2 -vf scale=16:8 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.130:1616/
+> ffmpeg filme.mp4 -framerate 2 -vf scale=16:8 -vcodec mjpeg -huffman 0 -pix_fmt yuvj420p -f rtp rtp://192.168.4.130:6454/
 
 ## Support
 
