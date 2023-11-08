@@ -34,8 +34,8 @@ int config_get_udp_port();
 const char *config_get_udp_server();
 
 void config_get_led_line(int line, enum LED_MODE *mode, int *size_x,
-		int *size_y, int *offset_x, int *offset_y,
-		enum LED_ORIENTATION *orientation, char options[65]);
+                         int *size_y, int *offset_x, int *offset_y,
+                         enum LED_ORIENTATION *orientation, char options[65]);
 
 uint8_t config_get_prefix_leds();
 int16_t config_get_refresh_rate();
@@ -48,8 +48,8 @@ void config_set_udp_port(uint16_t port);
 void config_set_udp_server(const char *);
 
 void config_set_led_line(int line, enum LED_MODE mode, int size_x, int size_y,
-		int offset_x, int offset_y, enum LED_ORIENTATION orientation,
-		const char *string);
+                         int offset_x, int offset_y,
+                         enum LED_ORIENTATION orientation, const char *string);
 
 void config_set_prefix_leds(uint8_t);
 void config_set_refresh_rate(int16_t);
@@ -63,6 +63,5 @@ const char *config_get_compile_date();
 const char *config_get_version();
 
 void config_set_partition_name(const char *partitionName);
-
 
 #endif /* MAIN_CONFIG_H_ */

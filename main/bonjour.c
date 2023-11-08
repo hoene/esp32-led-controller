@@ -15,8 +15,7 @@
 
 #include <mdns.h>
 
-void bonjour_on()
-{
+void bonjour_on() {
   char name[80];
   uint8_t mac[6];
 
@@ -38,8 +37,10 @@ void bonjour_on()
 
   // add our services
   ESP_ERROR_CHECK(mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0));
-  ESP_ERROR_CHECK(mdns_service_add(NULL, "_rtp", "_udp", config_get_udp_port(), NULL, 0));
-  ESP_ERROR_CHECK(mdns_service_add(NULL, "_artnet", "_udp", config_get_udp_port(), NULL, 0));
+  ESP_ERROR_CHECK(
+      mdns_service_add(NULL, "_rtp", "_udp", config_get_udp_port(), NULL, 0));
+  ESP_ERROR_CHECK(mdns_service_add(NULL, "_artnet", "_udp",
+                                   config_get_udp_port(), NULL, 0));
 }
 
 void bonjour_off() { mdns_free(); }

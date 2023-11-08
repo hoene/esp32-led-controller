@@ -9,7 +9,6 @@
  *      Author: hoene
  */
 
-
 #ifndef MAIN_MYSNTP_H_
 #define MAIN_MYSNTP_H_
 
@@ -18,4 +17,3 @@ void mysntp_off();
 void mysntp_retry();
 
 #endif /* MAIN_MYSNTP_H_ */
-

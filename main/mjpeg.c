@@ -22,6 +22,14 @@
 
 static const char *TAG = "#mjpeg";
 
+static TaskHandle_t remote_task = NULL;
+
+void mjpeg_frame_wait_for_new(void) {
+  remote_task = xTaskGetCurrentTaskHandle();
+  ulTaskNotifyTake(pdTRUE, 0);
+  remote_task = NULL;
+}
+
 /*
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -52,27 +60,18 @@ static struct MJPEG_FILE current;
 static struct MJPEG_FILE last;
 static xSemaphoreHandle xSemaphore;
 static int offset_counter;
-static TaskHandle_t remote_task = NULL;
 
-int mjpeg_has_frame() { return last.size > 0; }
+void mjpeg_frame_release() { xSemaphoreGive(xSemaphore); }
 
-struct MJPEG_FILE *mjpeg_waitfor_frame(TaskHandle_t task) {
-  for (;;) {
-    while (!xSemaphoreTake(xSemaphore, 1))
-      ;
-    if (last.size > 0)
-      break;
-    remote_task = task;
-    xSemaphoreGive(xSemaphore);
-    while (last.size == 0)
-      ulTaskNotifyTake(pdTRUE, 1);
-  }
-  return &last;
-}
+struct MJPEG_FILE *mjpeg_frame_access(TickType_t xTicksToWait) {
+  if (!xSemaphoreTake(xSemaphore, xTicksToWait))
+    return NULL;
 
-void mjpeg_release_frame() {
-  last.size = 0;
-  xSemaphoreGive(xSemaphore);
+  if (last.size > 0)
+    return &last;
+
+  mjpeg_frame_release();
+  return NULL;
 }
 
 static void finish_current() {
@@ -81,6 +80,7 @@ static void finish_current() {
     status_mjpeg_loss(1);
     ESP_LOGE(TAG, "dropping jpeg image of length %d", last.size);
   } else {
+    last.decoded = false;
     memcpy(&last, &current, sizeof(current));
     xSemaphoreGive(xSemaphore);
     if (remote_task)
@@ -92,8 +92,8 @@ static void finish_current() {
 void mjpeg_on() {
   current.size = 0;
   last.size = 0;
+  current.decoded = false;
   offset_counter = -1;
-
   vSemaphoreCreateBinary(xSemaphore);
 }
 

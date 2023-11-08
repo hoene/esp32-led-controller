@@ -5,10 +5,11 @@
 #ifndef MAIN_WEBJSON_H_
 #define MAIN_WEBJSON_H_
 
-#include <stdint.h>
-#include <stddef.h>
 #include <esp_http_server.h>
+#include <stddef.h>
+#include <stdint.h>
 
-int webjson_parseMessage(httpd_handle_t hd, int sockfd, const uint8_t *payload, size_t len);
+int webjson_parseMessage(httpd_handle_t hd, int sockfd, const uint8_t *payload,
+                         size_t len);
 
 #endif

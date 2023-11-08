@@ -380,12 +380,14 @@ static uint16 getExtendTest(uint8 i) {
   }
 }
 //------------------------------------------------------------------------------
- 
-static uint16 getExtendOffset(uint8 i) {
-static const uint16 extendedOffset[0x10] = { 0, 0xffff, 65533, 65529, 65521, 65505, 65473, 65409, 65281, 65025, 64513, 63489, 61441, 57345, 49153, 32769 };
-// (0xffff << i) + 1;
 
-  if((i & 0x10) != 0)
+static uint16 getExtendOffset(uint8 i) {
+  static const uint16 extendedOffset[0x10] = {
+      0,     0xffff, 65533, 65529, 65521, 65505, 65473, 65409,
+      65281, 65025,  64513, 63489, 61441, 57345, 49153, 32769};
+  // (0xffff << i) + 1;
+
+  if ((i & 0x10) != 0)
     return 0;
   else
     return extendedOffset[i];
@@ -867,7 +869,9 @@ static uint8 locateSOFMarker(void) {
     return PJPG_NO_ARITHMITIC_SUPPORT;
   }
   case M_SOF1: /* extended sequential DCT */
-  default: { return PJPG_UNSUPPORTED_MARKER; }
+  default: {
+    return PJPG_UNSUPPORTED_MARKER;
+  }
   }
 
   return 0;

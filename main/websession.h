@@ -2,7 +2,6 @@
 /* LED Controller for a matrix of smart LEDs */
 /* Copyright (C) 2018-2021 Symonics GmbH, Christian Hoene */
 
-
 #ifndef MAIN_WEBSESSION_H_
 #define MAIN_WEBSESSION_H_
 

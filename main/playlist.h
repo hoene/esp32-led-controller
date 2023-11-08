@@ -12,15 +12,24 @@
 #ifndef MAIN_PLAYLIST_H_
 #define MAIN_PLAYLIST_H_
 
-#include <stdint.h>
-#include "nvs_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "nvs_flash.h"
+#include <stdint.h>
 
 struct PLAYLIST_ENTRY {
-	char filename[16];
-	uint32_t duration;
-	enum uint8_t { PLAYLIST_NONE=0, PLAYLIST_BLANK, PLAYLIST_FIXED, PLAYLIST_FROMLEFT, PLAYLIST_FROMRIGHT, PLAYLIST_FROMTOP, PLAYLIST_FROMBOTTOM, PLAYLIST_LAST } mode;
+  char filename[16];
+  uint32_t duration;
+  enum uint8_t {
+    PLAYLIST_NONE = 0,
+    PLAYLIST_BLANK,
+    PLAYLIST_FIXED,
+    PLAYLIST_FROMLEFT,
+    PLAYLIST_FROMRIGHT,
+    PLAYLIST_FROMTOP,
+    PLAYLIST_FROMBOTTOM,
+    PLAYLIST_LAST
+  } mode;
 };
 
 void playlist_defaultConfig();

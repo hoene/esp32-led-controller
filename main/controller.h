@@ -12,5 +12,4 @@
 #ifndef MAIN_CONTROLLER_H_
 #define MAIN_CONTROLLER_H_
 
-
 #endif /* MAIN_CONTROLLER_H_ */

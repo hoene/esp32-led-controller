@@ -137,38 +137,44 @@ static void block(int no, pjpeg_image_info_t *block) {
 }
 
 static void decodeFile() {
-  file = mjpeg_waitfor_frame(taskHandle);
-  counter = 0;
+  file = mjpeg_frame_access(0);
+  if (!file)
+    return;
+  if (!file->decoded && file->size > 0) {
+    file->decoded = true;
+    counter = 0;
 
-  // Initializes the decompressor.
-  pjpeg_image_info_t pInfo;
-  int res = pjpeg_decode_init(&pInfo, pNeed_bytes_callback, (void *)file, 0);
-  ESP_ERROR_CHECK(res == 0 ? ESP_OK : ESP_FAIL);
-
-  int i = 0;
-  for (;;) {
-    // Decompresses the file's next MCU. Returns 0 on success,
-    // PJPG_NO_MORE_BLOCKS if no more blocks are available, or an error code.
-    res = pjpeg_decode_mcu();
-    if (res == PJPG_NO_MORE_BLOCKS)
-      break;
+    // Initializes the decompressor.
+    pjpeg_image_info_t pInfo;
+    int res = pjpeg_decode_init(&pInfo, pNeed_bytes_callback, (void *)file, 0);
     ESP_ERROR_CHECK(res == 0 ? ESP_OK : ESP_FAIL);
 
-    block(i, &pInfo);
-    i++;
+    int i = 0;
+    for (;;) {
+      // Decompresses the file's next MCU. Returns 0 on success,
+      // PJPG_NO_MORE_BLOCKS if no more blocks are available, or an error code.
+      res = pjpeg_decode_mcu();
+      if (res == PJPG_NO_MORE_BLOCKS)
+        break;
+      ESP_ERROR_CHECK(res == 0 ? ESP_OK : ESP_FAIL);
+
+      block(i, &pInfo);
+      i++;
+    }
   }
-  mjpeg_release_frame();
+  mjpeg_frame_release();
 }
 
 static void task(void *args) {
   for (;;) {
+    mjpeg_frame_wait_for_new();
     decodeFile();
   }
 }
 
 void decoding_on() {
-  ESP_ERROR_CHECK(xTaskCreate(task, "decoder", 4096, NULL, tskIDLE_PRIORITY + 9,
-                              &taskHandle) == pdPASS
+  ESP_ERROR_CHECK(xTaskCreate(task, "decoder", 4096, NULL, 1, &taskHandle) ==
+                          pdPASS
                       ? ESP_OK
                       : ESP_FAIL);
 }

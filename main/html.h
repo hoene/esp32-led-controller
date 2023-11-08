@@ -8,9 +8,9 @@
 #include <stdint.h>
 
 struct HTML_FILE {
-    const char *name;
-    const uint16_t *size;
-    const uint8_t *data;
+  const char *name;
+  const uint16_t *size;
+  const uint8_t *data;
 };
 
 extern struct HTML_FILE html_files[];

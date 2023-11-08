@@ -4,6 +4,11 @@
 
 #include "wifi.h"
 
+#include "config.h"
+#include "ethernet.h"
+#include "status.h"
+#include "udp.h"
+#include "web.h"
 #include <esp_event.h>
 #include <esp_log.h>
 #include <esp_system.h>
@@ -12,17 +17,13 @@
 #include <freertos/event_groups.h>
 #include <freertos/task.h>
 #include <lwip/err.h>
-#include <lwip/sys.h>
 #include <lwip/ip4_addr.h>
+#include <lwip/sys.h>
 #include <mdns.h>
 #include <string.h>
-#include "config.h"
-#include "ethernet.h"
-#include "status.h"
-#include "udp.h"
-#include "web.h"
 
-static const char *TAG = strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__;
+static const char *TAG =
+    strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__;
 
 #define EXAMPLE_MAX_STA_CONN 3
 
@@ -33,8 +34,7 @@ static int ap_connected;
 static int client_connecting = 0;
 static esp_netif_t *netif_ap = NULL;
 
-static void updateApConnected()
-{
+static void updateApConnected() {
   char line[64];
   snprintf(line, sizeof(line), "connected: %d", ap_connected);
   status_ap(line);
@@ -42,15 +42,13 @@ static void updateApConnected()
 
 /** Event handler for Ethernet events */
 static void wifi_event_handler(void *arg, esp_event_base_t event_base,
-                               int32_t event_id, void *event_data)
-{
+                               int32_t event_id, void *event_data) {
   char string[64];
   system_event_info_t *info = (system_event_info_t *)event_data;
 
   ESP_LOGD(TAG, "NETWORK WIFI_EVENT %s %d", event_base, event_id);
 
-  switch (event_id)
-  {
+  switch (event_id) {
 
   case SYSTEM_EVENT_STA_START:
     status_sta("start");
@@ -83,8 +81,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 
   case SYSTEM_EVENT_AP_STACONNECTED:
     ESP_LOGD(TAG, "station:" MACSTR " join, AID=%d",
-             MAC2STR(info->sta_connected.mac),
-             info->sta_connected.aid);
+             MAC2STR(info->sta_connected.mac), info->sta_connected.aid);
     ap_connected++;
     updateApConnected();
     break;
@@ -94,8 +91,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 
   case SYSTEM_EVENT_AP_STADISCONNECTED:
     ESP_LOGD(TAG, "station:" MACSTR "leave, AID=%d",
-             MAC2STR(info->sta_disconnected.mac),
-             info->sta_disconnected.aid);
+             MAC2STR(info->sta_disconnected.mac), info->sta_disconnected.aid);
     --ap_connected;
     updateApConnected();
     break;
@@ -106,12 +102,10 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 
   case SYSTEM_EVENT_SCAN_DONE:
     ESP_LOGD(TAG, "SCAN %d %d %04X", info->scan_done.number,
-             info->scan_done.scan_id,
-             info->scan_done.status);
+             info->scan_done.scan_id, info->scan_done.status);
     if (info->scan_done.status == 1) /** try again */
       wifi_scan();
-    else
-    {
+    else {
       wifi_scan_done(netif_ap);
       web_on();
     }
@@ -131,8 +125,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
   //  mdns_handle_system_event(ctx, event);
 }
 
-static void wifi_init_softap(esp_netif_t *netif_ap)
-{
+static void wifi_init_softap(esp_netif_t *netif_ap) {
 #if 0
    esp_netif_ip_info_t ip_info;
    esp_netif_set_ip4_addr(&ip_info.ip, 192, 168, 14, 1);
@@ -150,18 +143,17 @@ static void wifi_init_softap(esp_netif_t *netif_ap)
           sizeof(wifi_config.ap.ssid) - 1);
   strncpy((char *)wifi_config.ap.password, config_get_wifi_ap_password(),
           sizeof(wifi_config.ap.password) - 1);
-  if (strlen(config_get_wifi_ap_password()) == 0)
-  {
+  if (strlen(config_get_wifi_ap_password()) == 0) {
     wifi_config.ap.authmode = WIFI_AUTH_OPEN;
   }
 
   ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config));
 
-  ESP_LOGI(TAG, "wifi_init_softap finished.SSID:%s password:%s", config_get_wifi_ap_ssid(), config_get_wifi_ap_password());
+  ESP_LOGI(TAG, "wifi_init_softap finished.SSID:%s password:%s",
+           config_get_wifi_ap_ssid(), config_get_wifi_ap_password());
 }
 
-static void wifi_init_sta()
-{
+static void wifi_init_sta() {
   wifi_config_t wifi_config;
   memset(&wifi_config, 0, sizeof(wifi_config));
   strncpy((char *)wifi_config.sta.ssid, config_get_wifi_sta_ssid(),
@@ -174,31 +166,29 @@ static void wifi_init_sta()
   ESP_LOGI(TAG, "wifi_init_sta finished.");
   //	ESP_LOGI(TAG, "connect to ap SSID:%s password:%s",
   //			config_get_wifi_sta_ssid(),
-  //config_get_wifi_sta_password());
+  // config_get_wifi_sta_password());
 }
 
-const char *wifi_auth_names[6] = {"open", "WEP", "WPA",
+const char *wifi_auth_names[6] = {"open", "WEP",   "WPA",
                                   "WPA2", "WPA+2", "WPA2E"};
 
-static void wifi_scan_done(esp_netif_t *netif_ap)
-{
+static void wifi_scan_done(esp_netif_t *netif_ap) {
   uint16_t number;
   ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&number));
   ESP_LOGI(TAG, "AP NUM %04X", number);
 
   wifi_ap_record_t *ap_records = malloc(sizeof(wifi_ap_record_t) * number);
-  if (number > 0)
-  {
+  if (number > 0) {
     ESP_ERROR_CHECK(ap_records ? ESP_OK : ESP_ERR_NO_MEM);
     ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, ap_records));
 
-    for (int i = 0; i < number; i++)
-    {
-      ESP_LOGI(TAG, "AP %d: %02X%02X%02X%02X%02X%02X %d %s %s	", // %d %s %s %s,",
-               i, ap_records[i].bssid[0], ap_records[i].bssid[1],
-               ap_records[i].bssid[2], ap_records[i].bssid[3],
-               ap_records[i].bssid[4], ap_records[i].bssid[5], ap_records[i].rssi,
-               wifi_auth_names[ap_records[i].authmode], ap_records[i].ssid);
+    for (int i = 0; i < number; i++) {
+      ESP_LOGI(
+          TAG, "AP %d: %02X%02X%02X%02X%02X%02X %d %s %s	", // %d %s %s %s,",
+          i, ap_records[i].bssid[0], ap_records[i].bssid[1],
+          ap_records[i].bssid[2], ap_records[i].bssid[3],
+          ap_records[i].bssid[4], ap_records[i].bssid[5], ap_records[i].rssi,
+          wifi_auth_names[ap_records[i].authmode], ap_records[i].ssid);
     }
   }
 
@@ -212,8 +202,7 @@ static void wifi_scan_done(esp_netif_t *netif_ap)
   ESP_ERROR_CHECK(esp_wifi_start());
 }
 
-static void wifi_scan(system_event_sta_scan_done_t *done)
-{
+static void wifi_scan(system_event_sta_scan_done_t *done) {
   wifi_scan_config_t config = {
       .ssid = NULL,
       .bssid = NULL,
@@ -227,8 +216,7 @@ static void wifi_scan(system_event_sta_scan_done_t *done)
   ESP_ERROR_CHECK(esp_wifi_scan_start(&config, false));
 }
 
-void wifi_on()
-{
+void wifi_on() {
   ap_connected = 0;
 
   esp_netif_config_t ap_cfg = ESP_NETIF_DEFAULT_WIFI_AP();
@@ -249,7 +237,8 @@ void wifi_on()
 
   esp_netif_create_default_wifi_sta();
 
-  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL));
+  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
+                                             &wifi_event_handler, NULL));
 
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
   ESP_ERROR_CHECK(esp_wifi_init(&cfg));

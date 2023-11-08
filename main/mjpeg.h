@@ -21,6 +21,7 @@
 struct MJPEG_FILE {
   uint8_t buffer[MJPEG_MAX_SIZE];
   int size;
+  bool decoded;
 };
 
 void mjpeg_on();
@@ -28,8 +29,8 @@ void mjpeg_off();
 
 int mjpeg_header_parse(uint8_t *buffer, int length, uint8_t start, uint8_t end);
 
-int mjpeg_has_frame();
-struct MJPEG_FILE *mjpeg_waitfor_frame(TaskHandle_t task);
-void mjpeg_release_frame();
+struct MJPEG_FILE *mjpeg_frame_access(TickType_t xTicksToWait);
+void mjpeg_frame_release();
+void mjpeg_frame_wait_for_new();
 
 #endif /* MAIN_MJPEG_H_ */

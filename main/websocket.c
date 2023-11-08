@@ -10,7 +10,8 @@
 #include "webjson.h"
 #include "websession.h"
 
-static const char *TAG = strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__;
+static const char *TAG =
+    strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__;
 
 #if 0
 /*
@@ -85,52 +86,47 @@ static esp_err_t echo_handler(httpd_req_t *req)
 }
 #endif
 
-static esp_err_t echo_handler(httpd_req_t *req)
-{
-    if (req->method == HTTP_GET)
-    {
-        ESP_LOGI(TAG, "Handshake done, the new connection was opened");
-        return ESP_OK;
-    }
+static esp_err_t echo_handler(httpd_req_t *req) {
+  if (req->method == HTTP_GET) {
+    ESP_LOGI(TAG, "Handshake done, the new connection was opened");
+    return ESP_OK;
+  }
 
-    ESP_LOGI(TAG, "echo handler");
-    uint8_t buf[1600] = {0};
-    httpd_ws_frame_t ws_pkt;
-    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
-    ws_pkt.payload = buf;
-    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
-    esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, sizeof(buf));
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
-        return ret;
-    }
-    ESP_LOGI(TAG, "Got packet with message: %s %d %d", ws_pkt.payload, ws_pkt.len, ws_pkt.fragmented);
-    ESP_LOGI(TAG, "Packet type: %d", ws_pkt.type);
-    if (ws_pkt.fragmented)
-    {
-        ESP_LOGE(TAG, "httpd_ws_recv_frame failed with fragmented");
-        return ESP_FAIL;
-    }
+  ESP_LOGI(TAG, "echo handler");
+  uint8_t buf[1600] = {0};
+  httpd_ws_frame_t ws_pkt;
+  memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+  ws_pkt.payload = buf;
+  ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+  esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, sizeof(buf));
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
+    return ret;
+  }
+  ESP_LOGI(TAG, "Got packet with message: %s %d %d", ws_pkt.payload, ws_pkt.len,
+           ws_pkt.fragmented);
+  ESP_LOGI(TAG, "Packet type: %d", ws_pkt.type);
+  if (ws_pkt.fragmented) {
+    ESP_LOGE(TAG, "httpd_ws_recv_frame failed with fragmented");
+    return ESP_FAIL;
+  }
 
-    websession_setWebsocket(req->handle, httpd_req_to_sockfd(req), true);
+  websession_setWebsocket(req->handle, httpd_req_to_sockfd(req), true);
 
-    return webjson_parseMessage(req->handle, httpd_req_to_sockfd(req), ws_pkt.payload, ws_pkt.len);
+  return webjson_parseMessage(req->handle, httpd_req_to_sockfd(req),
+                              ws_pkt.payload, ws_pkt.len);
 }
 
-static const httpd_uri_t ws = {
-    .uri = "/ws",
-    .method = HTTP_GET,
-    .handler = echo_handler,
-    .user_ctx = NULL,
-    .is_websocket = true};
+static const httpd_uri_t ws = {.uri = "/ws",
+                               .method = HTTP_GET,
+                               .handler = echo_handler,
+                               .user_ctx = NULL,
+                               .is_websocket = true};
 
-void websocket_on(httpd_handle_t web_handle)
-{
-    httpd_register_uri_handler(web_handle, &ws);
+void websocket_on(httpd_handle_t web_handle) {
+  httpd_register_uri_handler(web_handle, &ws);
 }
 
-void websocket_off(httpd_handle_t web_handle)
-{
-    httpd_unregister_uri_handler(web_handle, ws.uri, ws.method);
+void websocket_off(httpd_handle_t web_handle) {
+  httpd_unregister_uri_handler(web_handle, ws.uri, ws.method);
 }

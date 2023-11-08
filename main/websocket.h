@@ -3,7 +3,7 @@
 /* Copyright (C) 2018-2021 Symonics GmbH, Christian Hoene */
 
 /**
- * 
+ *
  */
 
 #ifndef MAIN_WEBSOCKET_H_

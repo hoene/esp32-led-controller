@@ -828,8 +828,8 @@ uint16_t WS2812FX_mode_hyper_sparkle(int line) {
 
   if (random8(5) < 2) {
     for (uint16_t i = 0; i < max(1, segmentLength(line) / 3); i++) {
-      setPixelColor(line, fx_segments[line].start + random32(segmentLength(line)),
-                    WHITE);
+      setPixelColor(
+          line, fx_segments[line].start + random32(segmentLength(line)), WHITE);
     }
     return 20;
   }
