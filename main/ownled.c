@@ -9,15 +9,18 @@
  *      Author: hoene
  */
 
+#if 0
 #include "ownled.h"
 
 #include "controller.h"
-#include "driver/rmt.h"
+#include "driver/rmt_tx.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include "esp_intr_types.h"
+#include "driver/rmt_types.h"
 
 #include "gamma.c"
 
@@ -64,13 +67,13 @@ static enum OWNLED_COLOR_ORDER color_order = OWNLED_GRB;
  * RMT structure for one (high) and zero (low) impulse initialized by default
  * values
  */
-IRAM_ATTR rmt_item32_t cs8812_high = {
+IRAM_ATTR rmt_symbol_word_t cs8812_high = {
     .duration0 = DEFAULT_PULSE_LENGTH * DEFAULT_ONE_PULSE_LENGTH,
     .level0 = 1,
     .duration1 = DEFAULT_PULSE_LENGTH * (1 - DEFAULT_ONE_PULSE_LENGTH),
     .level1 = 0};
 
-IRAM_ATTR rmt_item32_t cs8812_low = {
+IRAM_ATTR rmt_symbol_word_t cs8812_low = {
     .duration0 = DEFAULT_PULSE_LENGTH * DEFAULT_ZERO_PULSE_LENGTH,
     .level0 = 1,
     .duration1 = DEFAULT_PULSE_LENGTH * (1 - DEFAULT_ZERO_PULSE_LENGTH),
@@ -138,7 +141,7 @@ static intr_handle_t isr_handle;
  */
 
 static struct {
-  rmt_channel_t rmtChannel;
+  rmt_channel_handle_t rmtChannel;
   uint16_t numBytes;
   uint8_t *frameBuffer;
   uint8_t *rmtBuffer;
@@ -213,22 +216,16 @@ void ownled_init() {
     lines[i].frameBuffer = NULL;
     lines[i].numBytes = 0;
 
-    rmt_config_t config = {.rmt_mode = RMT_MODE_TX,
-                           .channel = lines[i].rmtChannel,
-                           .clk_div = 1, // 80 MHz (APB CLK typical)
-                           .gpio_num = version_gpio[i],
-                           .mem_block_num = ownled_getBlocksize(),
-                           .tx_config = {
-                               .loop_en = false,
-                               .carrier_en = false,
-                               .carrier_freq_hz = 0,
-                               .carrier_duty_percent = 0,
-                               .carrier_level = RMT_CARRIER_LEVEL_HIGH,
-                               .idle_level = RMT_IDLE_LEVEL_LOW,
-                               .idle_output_en = true,
-                           }};
-
-    gpio_pad_select_gpio(version_gpio[i]);
+    rmt_tx_channel_config_t config = {
+          .clk_src = RMT_CLK_SRC_DEFAULT,   // select source clock
+    .gpio_num = version_gpio[i],                    // GPIO number
+    .mem_block_symbols = 64,          // memory block size, 64 * 4 = 256 Bytes
+    .resolution_hz = 1 * 1000 * 1000, // 1 MHz tick resolution, i.e., 1 tick = 1 µs
+    .trans_queue_depth = 4,           // set the number of transactions that can pend in the background
+    .flags.invert_out = false,        // do not invert output signal
+    .flags.with_dma = false          // do not need DMA backend
+    };
+q    gpio_pad_select_gpio(version_gpio[i]);
     gpio_set_level(version_gpio[i], 0);
     gpio_set_direction(version_gpio[i], GPIO_MODE_OUTPUT);
 
@@ -526,3 +523,4 @@ void ownled_free() {
   }
   rmt_isr_deregister(isr_handle);
 }
+#endif

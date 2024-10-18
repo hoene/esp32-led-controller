@@ -30,9 +30,9 @@ static const char *TAG = "#mysntp";
 void mysntp_on() {
   char ntp_server[30] = "pool.ntp.org";
   ESP_LOGI(TAG, "Initializing SNTP");
-  sntp_setoperatingmode(SNTP_OPMODE_POLL);
-  sntp_setservername(0, ntp_server);
-  sntp_init();
+  esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
+  esp_sntp_setservername(0, ntp_server);
+  esp_sntp_init();
 }
 
 void mysntp_retry() {
@@ -44,4 +44,4 @@ void mysntp_retry() {
   }
 }
 
-void mysntp_off() { sntp_stop(); }
+void mysntp_off() { esp_sntp_stop(); }

@@ -19,6 +19,9 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_mac.h"
+#include "esp_chip_info.h"
+#include "esp_flash.h"
 
 #include "bonjour.h"
 #include "config.h"
@@ -47,7 +50,7 @@ static void printChipInfo() {
 
   const esp_partition_t *last = esp_ota_get_last_invalid_partition();
   if (last)
-    ESP_LOGI(TAG, "last invalid partition %08X:%s", last->address, last->label);
+    ESP_LOGI(TAG, "last invalid partition %08lX:%s", last->address, last->label);
 
   uint8_t mac[6];
   esp_efuse_mac_get_default(mac);
@@ -65,7 +68,10 @@ static void printChipInfo() {
 
   ESP_LOGD(TAG, "silicon revision %d, ", chip_info.revision);
 
-  ESP_LOGD(TAG, "%dMB %s flash", spi_flash_get_chip_size() / (1024 * 1024),
+    uint32_t size_flash_chip;
+    esp_flash_get_size(NULL, &size_flash_chip);
+
+  ESP_LOGD(TAG, "%luMB %s flash", size_flash_chip / (1024 * 1024),
            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded"
                                                          : "external");
 
@@ -81,13 +87,13 @@ static void printChipInfo() {
   if (running != NULL && configured != NULL) {
     if (configured != running) {
       ESP_LOGI(TAG,
-               "Configured OTA boot partition at offset 0x%08x, but running "
-               "from offset 0x%08x",
+               "Configured OTA boot partition at offset 0x%08lx, but running "
+               "from offset 0x%08lx",
                configured->address, running->address);
       ESP_LOGI(TAG, "(This can happen if either the OTA boot data or preferred "
                     "boot image become corrupted somehow.)");
     }
-    ESP_LOGI(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
+    ESP_LOGI(TAG, "Running partition type %d subtype %d (offset 0x%08lx)",
              running->type, running->subtype, running->address);
   }
 }

@@ -58,7 +58,7 @@ struct __attribute__((packed)) quantizationTable {
 
 static struct MJPEG_FILE current;
 static struct MJPEG_FILE last;
-static xSemaphoreHandle xSemaphore;
+static SemaphoreHandle_t xSemaphore;
 static int offset_counter;
 
 void mjpeg_frame_release() { xSemaphoreGive(xSemaphore); }
@@ -155,7 +155,7 @@ int mjpeg_header_parse(uint8_t *buffer, int length, uint8_t start,
     struct quantizationTable *qTableHeader = (struct quantizationTable *)buffer;
     qTableHeader->len = ntohs(qTableHeader->len);
 
-    ESP_LOGV(TAG, "%08XL tbd %u prec %u len %u", *(uint32_t *)buffer,
+    ESP_LOGV(TAG, "%08lXq tbd %u prec %u len %u", *(uint32_t *)buffer,
              qTableHeader->tbd, qTableHeader->precision, qTableHeader->len);
 
     if (qTableHeader->precision != 0 ||

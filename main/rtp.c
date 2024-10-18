@@ -155,7 +155,7 @@ int rtp_parse(uint8_t *buffer, int length) {
   header->seq = ntohs(header->seq);
   header->ts = ntohl(header->ts);
 
-  ESP_LOGD(TAG, "rtp header %02X %02X %u %u %u %u %u %u %u %u", buffer[0],
+  ESP_LOGD(TAG, "rtp header %02X %02X %u %u %u %u %u %u %u %lu", buffer[0],
            buffer[1], header->version, header->p, header->x, header->cc,
            header->m, header->pt, header->seq, header->ts);
 
@@ -196,7 +196,7 @@ int rtp_parse(uint8_t *buffer, int length) {
   last_ts = header->ts;
   counter++;
 
-  ESP_LOGD(TAG, "pt %d seq %d ts %u restart %d end %d len %d", header->pt,
+  ESP_LOGD(TAG, "pt %d seq %d ts %lu restart %d end %d len %d", header->pt,
            header->seq, header->ts, restart, header->m, length - headerLength);
 
   length -= headerLength;

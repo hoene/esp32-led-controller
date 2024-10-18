@@ -73,7 +73,7 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base,
     ESP_LOGI(TAG, "Ethernet Stopped");
     break;
   default:
-    ESP_LOGI(TAG, "unknown Ethernet event %d", event_id);
+    ESP_LOGI(TAG, "unknown Ethernet event %ld", event_id);
     break;
   }
 }
@@ -116,15 +116,17 @@ void ethernet_on() {
   vTaskDelay(pdMS_TO_TICKS(10));
 
 #if CONFIG_CONTROLLER_USE_INTERNAL_ETHERNET
-  mac_config.smi_mdc_gpio_num = CONFIG_CONTROLLER_ETH_MDC_GPIO;
-  mac_config.smi_mdio_gpio_num = CONFIG_CONTROLLER_ETH_MDIO_GPIO;
-  esp_eth_mac_t *mac = esp_eth_mac_new_esp32(&mac_config);
+  eth_esp32_emac_config_t esp32_emac_config = ETH_ESP32_EMAC_DEFAULT_CONFIG(); // apply default vendor-specific MAC configuration
+
+  esp32_emac_config.smi_gpio.mdc_num = CONFIG_CONTROLLER_ETH_MDC_GPIO;
+  esp32_emac_config.smi_gpio.mdio_num = CONFIG_CONTROLLER_ETH_MDIO_GPIO;
+  esp_eth_mac_t *mac = esp_eth_mac_new_esp32(&esp32_emac_config, &mac_config);
 #if CONFIG_CONTROLLER_ETH_PHY_IP101
   esp_eth_phy_t *phy = esp_eth_phy_new_ip101(&phy_config);
 #elif CONFIG_CONTROLLER_ETH_PHY_RTL8201
   esp_eth_phy_t *phy = esp_eth_phy_new_rtl8201(&phy_config);
 #elif CONFIG_CONTROLLER_ETH_PHY_LAN8720
-  esp_eth_phy_t *phy = esp_eth_phy_new_lan8720(&phy_config);
+  esp_eth_phy_t *phy = esp_eth_phy_new_lan87xx(&phy_config);
 #elif CONFIG_CONTROLLER_ETH_PHY_DP83848
   esp_eth_phy_t *phy = esp_eth_phy_new_dp83848(&phy_config);
 #endif

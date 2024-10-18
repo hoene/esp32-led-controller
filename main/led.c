@@ -484,7 +484,7 @@ static void task(void *args) {
         vTaskDelayUntil(&xLastWakeTime, incrementTicks);
         if (xLastWakeTime + incrementTicks < xTaskGetTickCount()) {
           if (!missed) {
-            ESP_LOGE(TAG, "frame(s) missed %d",
+            ESP_LOGE(TAG, "frame(s) missed %lu",
                      xTaskGetTickCount() - xLastWakeTime);
             missed = true;
           }
@@ -493,7 +493,7 @@ static void task(void *args) {
         } else if (xTaskGetTickCount() - xLastWakeTime > 2 &&
                    xLastWakeTime < xTaskGetTickCount()) {
           if (!missed)
-            ESP_LOGD(TAG, "frame late %d", xTaskGetTickCount() - xLastWakeTime);
+            ESP_LOGD(TAG, "frame late %lu", xTaskGetTickCount() - xLastWakeTime);
           status_led_top_too_late();
           continue;
         }

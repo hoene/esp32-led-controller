@@ -148,7 +148,7 @@ esp_err_t OTA_update_post_handler(httpd_req_t *req) {
         httpd_resp_send_500(req);
         return ESP_FAIL;
       } else {
-        ESP_LOGD(TAG, "Writing to partition subtype %d at offset 0x%x",
+         ESP_LOGD(TAG, "Writing to partition subtype %u at offset 0x%lx",
                  update_partition->subtype, update_partition->address);
       }
     }
@@ -162,7 +162,7 @@ esp_err_t OTA_update_post_handler(httpd_req_t *req) {
     if (esp_ota_set_boot_partition(update_partition) == ESP_OK) {
       const esp_partition_t *boot_partition = esp_ota_get_boot_partition();
 
-      ESP_LOGI(TAG, "Next boot partition subtype %d at offset 0x%x",
+       ESP_LOGI(TAG, "Next boot partition subtype %d at offset 0x%lx",
                boot_partition->subtype, boot_partition->address);
       ESP_LOGI(TAG, "Please restart system");
       httpd_resp_send(req, "done", 5);

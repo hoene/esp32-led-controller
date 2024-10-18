@@ -19,7 +19,7 @@
 #include <lwip/err.h>
 #include <lwip/ip4_addr.h>
 #include <lwip/sys.h>
-#include <mdns.h>
+#include <lwip/apps/mdns.h>
 #include <string.h>
 
 static const char *TAG =
@@ -40,6 +40,7 @@ static void updateApConnected() {
   status_ap(line);
 }
 
+#if 0
 /** Event handler for Ethernet events */
 static void wifi_event_handler(void *arg, esp_event_base_t event_base,
                                int32_t event_id, void *event_data) {
@@ -124,6 +125,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 
   //  mdns_handle_system_event(ctx, event);
 }
+#endif
 
 static void wifi_init_softap(esp_netif_t *netif_ap) {
 #if 0
@@ -202,6 +204,7 @@ static void wifi_scan_done(esp_netif_t *netif_ap) {
   ESP_ERROR_CHECK(esp_wifi_start());
 }
 
+#if 0
 static void wifi_scan(system_event_sta_scan_done_t *done) {
   wifi_scan_config_t config = {
       .ssid = NULL,
@@ -215,6 +218,7 @@ static void wifi_scan(system_event_sta_scan_done_t *done) {
 
   ESP_ERROR_CHECK(esp_wifi_scan_start(&config, false));
 }
+#endif
 
 void wifi_on() {
   ap_connected = 0;
@@ -237,8 +241,10 @@ void wifi_on() {
 
   esp_netif_create_default_wifi_sta();
 
+#if 0
   ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
                                              &wifi_event_handler, NULL));
+#endif
 
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
   ESP_ERROR_CHECK(esp_wifi_init(&cfg));

@@ -13,8 +13,11 @@
 
 #include "config.h"
 
-#include <mdns.h>
+#include <lwip/apps/mdns.h>
+// #include "..mdns.h"
+#include "esp_mac.h"
 
+#if 0
 void bonjour_on() {
   char name[80];
   uint8_t mac[6];
@@ -44,3 +47,4 @@ void bonjour_on() {
 }
 
 void bonjour_off() { mdns_free(); }
+#endif

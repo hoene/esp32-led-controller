@@ -19,6 +19,7 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "mbedtls/md.h"
+#include "esp_mac.h"
 
 #include "config.h"
 #include "rtp.h"
@@ -77,7 +78,7 @@ static int getSocket() {
     assert(server_ip->ai_family == AF_INET);
     struct sockaddr_in *server = (struct sockaddr_in *)server_ip->ai_addr;
     ESP_LOGI(
-        TAG, "%s == %d.%d.%d.%d", server_ip->ai_canonname,
+        TAG, "%s == %lu.%lu.%lu.%lu", server_ip->ai_canonname,
         server->sin_addr.s_addr & 255, (server->sin_addr.s_addr >> 8) & 255,
         (server->sin_addr.s_addr >> 16) & 255, server->sin_addr.s_addr >> 24);
   }

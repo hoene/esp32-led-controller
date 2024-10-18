@@ -17,6 +17,7 @@
 #include "status.h"
 #include "websession.h"
 #include "wifi.h"
+#include "esp_mac.h"
 
 static const char *TAG =
     strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__;
@@ -118,7 +119,7 @@ static cJSON *status_to_json() {
 
   /* uptime */
   time(&now);
-  snprintf(line, sizeof(line), "%ld", now);
+  snprintf(line, sizeof(line), "%lld", now);
   cJSON_AddItemToObject(json, "time", cJSON_CreateString(line));
 
   /* networking */
