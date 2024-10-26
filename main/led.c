@@ -526,6 +526,12 @@ static void task(void *args) {
 
       for (int i = 0; i < led_get_max_lines(); i++) {
 
+        if(led_config.channel[i].mode != LED_MODE_PRODUCTION_TEST)
+          ownled_clearGenesisTestmode(i);
+        else {
+          ownled_setGenesisTestmode(i);
+        }
+
         switch (led_config.channel[i].mode) {
         case LED_MODE_OFF:
           fill(i, 0, 0, 0);
