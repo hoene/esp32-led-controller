@@ -25,6 +25,8 @@ extern void ownled_setPixel(uint8_t c, uint16_t pos, uint8_t r, uint8_t g,
                             uint8_t b);
 extern uint8_t ownled_getChannels();
 extern void ownled_setSize(uint8_t channel, uint16_t numPixel);
+extern void ownled_setGenesisTestmode(uint8_t channel);
+extern void ownled_clearGenesisTestmode(uint8_t channel);
 
 esp_err_t ownled_set_pulses(uint32_t frequency, uint8_t one, uint8_t zero);
 uint32_t ownled_get_pulse_frequency();

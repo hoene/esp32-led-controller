@@ -142,6 +142,7 @@ static struct {
   uint16_t numBytes;
   uint8_t *frameBuffer;
   uint8_t *rmtBuffer;
+  bool genesis_testmode;
 } lines[MAXIMAL_LINES];
 
 /**
@@ -212,6 +213,7 @@ void ownled_init() {
     lines[i].rmtChannel = i * ownled_getBlocksize();
     lines[i].frameBuffer = NULL;
     lines[i].numBytes = 0;
+    lines[i].genesis_testmode = false;
 
     rmt_config_t config = {.rmt_mode = RMT_MODE_TX,
                            .channel = lines[i].rmtChannel,
@@ -386,6 +388,30 @@ extern void ownled_setPixel(uint8_t c, uint16_t pos, uint8_t g, uint8_t b,
   }
 }
 
+extern void ownled_clearGenesisTestmode(uint8_t c)
+{
+  lines[c].genesis_testmode = false;
+}
+
+extern void ownled_setGenesisTestmode(uint8_t c)
+{
+  int blocksize = ownled_getBlocksize() * BYTES_PER_LINE;
+  if(lines[c].numBytes +2 < blocksize) {
+    lines[c].genesis_testmode = true;
+
+    if(lines[c].numBytes & 1) {
+      lines[c].rmtBuffer[lines[c].numBytes] = 0xA0;
+      lines[c].rmtBuffer[lines[c].numBytes+1] = 0x03;
+    }
+    else {
+      lines[c].rmtBuffer[lines[c].numBytes] = 0x20;
+      lines[c].rmtBuffer[lines[c].numBytes+1] = 0x83;
+    }
+
+  }
+}
+
+
 void ownled_send() {
   int item_num = ownled_getBlocksize() * RMT_MEM_ITEM_NUM;
   uint8_t bytesPre = item_num >> 3;
@@ -430,7 +456,10 @@ void ownled_send() {
 
     /** fill remaining bytes into fastrmi buffer */
     fastrmi_para[i].counter = bytesPre;
-    fastrmi_para[i].length = lines[i].numBytes;
+    if(lines[i].genesis_testmode)
+      fastrmi_para[i].length = lines[i].numBytes+2;
+    else
+      fastrmi_para[i].length = lines[i].numBytes;
     fastrmi_para[i].baseAddress =
         0x3ff56800 + RMT_MEM_BLOCK_BYTE_NUM * lines[i].rmtChannel;
     fastrmi_para[i].mask = (ownled_getBlocksize() * RMT_MEM_BLOCK_BYTE_NUM) - 1;
